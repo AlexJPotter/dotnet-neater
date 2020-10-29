@@ -22,44 +22,15 @@ namespace DotnetNeater.CLI
             var syntaxTree = CSharpSyntaxTree.ParseText(inputFileContents);
             var rootNode = (CSharpSyntaxNode) await syntaxTree.GetRootAsync();
 
-            var newNode = RemoveAllTrailingWhitespace(rootNode);
+            var rulesToApply = new[]
+            {
+                new TrimTrailingWhitespaceRule(),
+            };
 
-            var outputFileContents = newNode.GetText().ToString();
+            rootNode = rulesToApply.Aggregate(rootNode, (current, rule) => rule.ApplyToNode(current));
+
+            var outputFileContents = rootNode.GetText().ToString();
             Console.Write("OUTPUT:\r\n" + "--------------------\r\n" + outputFileContents.WithVisibleWhitespace() + "--------------------\r\n\r\n");
-        }
-
-        private static CSharpSyntaxNode RemoveAllTrailingWhitespace(CSharpSyntaxNode node)
-        {
-            var returnNode = node;
-
-            for (var tokenIndex = 0; tokenIndex < returnNode.ChildTokens().Count(); tokenIndex++)
-            {
-                var oldToken = returnNode.ChildTokens().ToList()[tokenIndex];
-
-                var newToken = oldToken;
-
-                var trailingTrivia = newToken.TrailingTrivia;
-
-                var endOfLineTrivia = trailingTrivia.Any(t => t.IsKind(SyntaxKind.EndOfLineTrivia))
-                    ? trailingTrivia.First(t => t.IsKind(SyntaxKind.EndOfLineTrivia))
-                    : (SyntaxTrivia?) null;
-
-                if (endOfLineTrivia != null)
-                {
-                    newToken = newToken.WithTrailingTrivia(endOfLineTrivia.Value);
-                }
-
-                returnNode = returnNode.ReplaceToken(oldToken, newToken);
-            }
-
-            for (var nodeIndex = 0; nodeIndex < returnNode.ChildNodes().Count(); nodeIndex++)
-            {
-                var oldNode = returnNode.ChildNodes().ToList()[nodeIndex];
-                var newNode = RemoveAllTrailingWhitespace((CSharpSyntaxNode) oldNode);
-                returnNode = returnNode.ReplaceNode(oldNode, newNode);
-            }
-
-            return returnNode;
         }
     }
 }
