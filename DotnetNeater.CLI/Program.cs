@@ -62,7 +62,6 @@ namespace DotnetNeater.CLI
                 .ToList();
 
             Console.WriteLine($"Found {filesToFormat.Count} C# files to format ...\r\n");
-            await Task.Delay(2000);
 
             foreach (var filePath in filesToFormat)
             {

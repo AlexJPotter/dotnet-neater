@@ -31,83 +31,67 @@ namespace DotnetNeater.CLI
 
         private static SyntaxToken ApplyToToken(SyntaxToken token)
         {
-            token = token.WithLeadingTrivia(NormaliseLeadingTrivia(token.LeadingTrivia));
-            token = token.WithTrailingTrivia(NormaliseTrailingTrivia(token.TrailingTrivia));
+            // Leading trivia can include multiple lines preceding the token, some of which may have trailing whitespace
+            token = token.WithLeadingTrivia(RemoveTrailingWhitespaceFromTrivia(token, token.LeadingTrivia));
+
+            token = token.WithTrailingTrivia(RemoveTrailingWhitespaceFromTrivia(token, token.TrailingTrivia));
+
             return token;
         }
 
-        private static SyntaxTriviaList NormaliseLeadingTrivia(SyntaxTriviaList triviaList)
+        private static SyntaxTriviaList RemoveTrailingWhitespaceFromTrivia(SyntaxToken token, SyntaxTriviaList triviaList)
         {
-            var triviaLines = SplitByLine(triviaList).ToList();
+            var triviaGroupedByLine = GroupTriviaByLine(triviaList).ToList();
 
-            var indentWidth = !triviaLines.Any() ? 0 : triviaLines.Last().Sum(t => t.FullSpan.Length);
-
-            return triviaLines
-                .SelectMany((triviaLine, lineIndex) => NormaliseTriviaLine(
-                    triviaLine: triviaLine,
-                    hasLeadingCode: false,
-                    indentWidth: indentWidth
-                ).ToList())
+            return triviaGroupedByLine
+                .SelectMany((triviaForSingleLine, lineIndex) =>
+                    RemoveTrailingWhitespaceTriviaForSingleLine(token, triviaForSingleLine).ToList()
+                )
                 .ToSyntaxTriviaList();
         }
 
-        private static SyntaxTriviaList NormaliseTrailingTrivia(SyntaxTriviaList triviaList)
+        private static SyntaxTriviaList RemoveTrailingWhitespaceTriviaForSingleLine(
+            SyntaxToken token,
+            SyntaxTriviaList triviaForSingleLine
+        )
         {
-            var triviaLines = SplitByLine(triviaList).ToList();
+            var endOfLineCount = triviaForSingleLine.Count(t => t.IsKind(SyntaxKind.EndOfLineTrivia));
 
-            return triviaLines
-                .SelectMany((triviaLine, lineIndex) => NormaliseTriviaLine(
-                    triviaLine: triviaLine,
-                    hasLeadingCode: lineIndex == 0,
-                    indentWidth: 0
-                ).ToList())
-                .ToSyntaxTriviaList();
-        }
-
-        private static SyntaxTriviaList NormaliseTriviaLine(SyntaxTriviaList triviaLine, bool hasLeadingCode, int indentWidth)
-        {
-            var endOfLineCount = triviaLine.Count(t => t.IsKind(SyntaxKind.EndOfLineTrivia));
-
-            // If the trivia doesn't run to the end of the line then we don't want to touch it
-            if (endOfLineCount == 0)
-            {
-                return triviaLine;
-            }
+            // If the trivia doesn't run to the end of the line (or the end of the file) then we don't want to touch it
+            if (endOfLineCount == 0 && !token.IsKind(SyntaxKind.EndOfFileToken))
+                return triviaForSingleLine;
 
             if (endOfLineCount > 1)
-            {
                 throw new ArgumentException($"Expected at most 1 end of line, received {endOfLineCount}");
-            }
 
-            if (!triviaLine.Last().IsKind(SyntaxKind.EndOfLineTrivia))
-            {
+            if (!token.IsKind(SyntaxKind.EndOfFileToken) && !triviaForSingleLine.Last().IsKind(SyntaxKind.EndOfLineTrivia))
                 throw new ArgumentException("Expected the last trivia to be the end of line trivia");
-            }
 
             // Comments make things a bit more complicated
-            var comment = triviaLine.Any(t => t.IsKind(SyntaxKind.SingleLineCommentTrivia))
-                ? triviaLine.SingleOrDefault(t => t.IsKind(SyntaxKind.SingleLineCommentTrivia))
+            var comment = triviaForSingleLine.Any(t => t.IsKind(SyntaxKind.SingleLineCommentTrivia))
+                ? triviaForSingleLine.SingleOrDefault(t => t.IsKind(SyntaxKind.SingleLineCommentTrivia))
                 : (SyntaxTrivia?) null;
 
-            triviaLine = triviaLine
-                .Where((t, i) => comment == null || hasLeadingCode
+            var indexOfComment = comment == null ? (int?) null : triviaForSingleLine.IndexOf(comment.Value);
+
+            triviaForSingleLine = triviaForSingleLine
+                .Where((t, i) => indexOfComment == null
+                    // If no comment, just remove all whitespace
                     ? !t.IsKind(SyntaxKind.WhitespaceTrivia)
-                    : (i <= triviaLine.IndexOf(comment.Value) || !t.IsKind(SyntaxKind.WhitespaceTrivia))
+                    // Otherwise only remove whitespace that comes after the comment
+                    : (i <= indexOfComment.Value || !t.IsKind(SyntaxKind.WhitespaceTrivia))
                 )
-                .Select(t => !t.IsKind(SyntaxKind.SingleLineCommentTrivia) ? t : TriviaHelpers.NormaliseSingleLineComment(t))
-                .Select(t => !t.IsKind(SyntaxKind.WhitespaceTrivia) || comment == null ? t : SyntaxFactory.Whitespace(new string(' ', indentWidth)))
+                .Select(t => !t.IsKind(SyntaxKind.SingleLineCommentTrivia)
+                    ? t
+                    // Trailing whitespace after a single line comment is treated as part of the comment text
+                    : TriviaHelpers.TrimTrailingWhitespaceFromSingleLineComment(t)
+                )
                 .ToSyntaxTriviaList();
 
-            if (comment != null && hasLeadingCode)
-            {
-                // Ensure there is a single space between the end of the code and the start of the comment
-                triviaLine = triviaLine.Prepend(SyntaxFactory.Whitespace(" ")).ToSyntaxTriviaList();
-            }
-
-            return triviaLine;
+            return triviaForSingleLine;
         }
 
-        private static IEnumerable<SyntaxTriviaList> SplitByLine(SyntaxTriviaList triviaList)
+        private static IEnumerable<SyntaxTriviaList> GroupTriviaByLine(SyntaxTriviaList triviaList)
         {
             var result = new List<SyntaxTriviaList>();
             var currentLine = new List<SyntaxTrivia>();

@@ -6,7 +6,7 @@ namespace DotnetNeater.CLI
 {
     public static class TriviaHelpers
     {
-        public static SyntaxTrivia NormaliseSingleLineComment(SyntaxTrivia commentTrivia)
+        public static SyntaxTrivia TrimTrailingWhitespaceFromSingleLineComment(SyntaxTrivia commentTrivia)
         {
             if (!commentTrivia.IsKind(SyntaxKind.SingleLineCommentTrivia))
             {
@@ -17,8 +17,8 @@ namespace DotnetNeater.CLI
             }
 
             const string commentIndicator = "//";
-            var commentText = commentTrivia.ToString().Substring(commentIndicator.Length).Trim();
-            return SyntaxFactory.Comment($"{commentIndicator} {commentText}");
+            var commentText = commentTrivia.ToString().Substring(commentIndicator.Length).TrimEnd();
+            return SyntaxFactory.Comment($"{commentIndicator}{commentText}");
         }
     }
 }
