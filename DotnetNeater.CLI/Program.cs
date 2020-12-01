@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using DotnetNeater.CLI.Core;
 using Microsoft.Build.Construction;
 using Microsoft.CodeAnalysis.CSharp;
 
@@ -10,11 +10,6 @@ namespace DotnetNeater.CLI
 {
     public static class Program
     {
-        private static readonly IEnumerable<IFormattingRule> RulesToApply = new[]
-        {
-            new TrimTrailingWhitespaceRule(),
-        };
-
         public static async Task Main(string[] args)
         {
             Console.WriteLine();
@@ -75,11 +70,14 @@ namespace DotnetNeater.CLI
         {
             var oldFileContents = await File.ReadAllTextAsync(filePath);
 
-            var oldSyntaxTree = CSharpSyntaxTree.ParseText(oldFileContents);
-            var oldRootNode = (CSharpSyntaxNode) await oldSyntaxTree.GetRootAsync();
+            var oldSyntaxTree = (CSharpSyntaxTree) CSharpSyntaxTree.ParseText(oldFileContents);
+            var oldRootNode = await oldSyntaxTree.GetRootAsync();
 
-            var newRootNode = RulesToApply.Aggregate(oldRootNode, (current, rule) => rule.ApplyToNode(current));
-            var newSyntaxTree = CSharpSyntaxTree.Create(newRootNode);
+            var operationRepresentation = SyntaxTreeParser.GetOperationRepresentation(oldRootNode);
+            var documentRepresentation = DocumentParser.ParseOperation(operationRepresentation);
+            var prettyPrinted = PrintHelpers.Pretty(30, documentRepresentation);
+
+            var newSyntaxTree = (CSharpSyntaxTree) CSharpSyntaxTree.ParseText(prettyPrinted);
 
             var hasChanged = newSyntaxTree.GetChanges(oldSyntaxTree).Any();
 

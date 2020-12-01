@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using DotnetNeater.CLI.Extensions;
+using DotnetNeater.CLI.Helpers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 
 namespace DotnetNeater.CLI
 {
-    public class TrimTrailingWhitespaceRule : IFormattingRule
+    public static class TrimTrailingWhitespace
     {
-        public string Name => "TrimTrailingWhitespace";
-
-        public CSharpSyntaxNode ApplyToNode(CSharpSyntaxNode node)
+        public static CSharpSyntaxNode FromNode(CSharpSyntaxNode node)
         {
             for (var tokenIndex = 0; tokenIndex < node.ChildTokens().Count(); tokenIndex++)
             {
@@ -22,7 +22,7 @@ namespace DotnetNeater.CLI
             for (var nodeIndex = 0; nodeIndex < node.ChildNodes().Count(); nodeIndex++)
             {
                 var oldNode = node.ChildNodes().ToList()[nodeIndex];
-                var newNode = ApplyToNode((CSharpSyntaxNode) oldNode);
+                var newNode = TrimTrailingWhitespace.FromNode((CSharpSyntaxNode) oldNode);
                 node = node.ReplaceNode(oldNode, newNode);
             }
 
@@ -43,11 +43,10 @@ namespace DotnetNeater.CLI
         {
             var triviaGroupedByLine = GroupTriviaByLine(triviaList).ToList();
 
-            return triviaGroupedByLine
-                .SelectMany((triviaForSingleLine, lineIndex) =>
-                    RemoveTrailingWhitespaceTriviaForSingleLine(token, triviaForSingleLine).ToList()
-                )
-                .ToSyntaxTriviaList();
+            return SyntaxTriviaExtensions.ToSyntaxTriviaList(triviaGroupedByLine
+                    .SelectMany((triviaForSingleLine, lineIndex) =>
+                        RemoveTrailingWhitespaceTriviaForSingleLine(token, triviaForSingleLine).ToList()
+                    ));
         }
 
         private static SyntaxTriviaList RemoveTrailingWhitespaceTriviaForSingleLine(
@@ -55,38 +54,37 @@ namespace DotnetNeater.CLI
             SyntaxTriviaList triviaForSingleLine
         )
         {
-            var endOfLineCount = triviaForSingleLine.Count(t => t.IsKind(SyntaxKind.EndOfLineTrivia));
+            var endOfLineCount = triviaForSingleLine.Count(t => t.IsEndOfLine());
 
             // If the trivia doesn't run to the end of the line (or the end of the file) then we don't want to touch it
-            if (endOfLineCount == 0 && !token.IsKind(SyntaxKind.EndOfFileToken))
+            if (endOfLineCount == 0 && !token.IsEndOfFile())
                 return triviaForSingleLine;
 
             if (endOfLineCount > 1)
                 throw new ArgumentException($"Expected at most 1 end of line, received {endOfLineCount}");
 
-            if (!token.IsKind(SyntaxKind.EndOfFileToken) && !triviaForSingleLine.Last().IsKind(SyntaxKind.EndOfLineTrivia))
-                throw new ArgumentException("Expected the last trivia to be the end of line trivia");
+            if (!token.IsEndOfFile() && !triviaForSingleLine.Last().IsEndOfLine())
+                throw new ArgumentException("Expected the last trivia to be end of line trivia or end of file trivia");
 
             // Comments make things a bit more complicated
-            var comment = triviaForSingleLine.Any(t => t.IsKind(SyntaxKind.SingleLineCommentTrivia))
-                ? triviaForSingleLine.SingleOrDefault(t => t.IsKind(SyntaxKind.SingleLineCommentTrivia))
+            var comment = triviaForSingleLine.Any(t => t.IsAnyComment())
+                ? triviaForSingleLine.SingleOrDefault(t => t.IsAnyComment())
                 : (SyntaxTrivia?) null;
 
             var indexOfComment = comment == null ? (int?) null : triviaForSingleLine.IndexOf(comment.Value);
 
-            triviaForSingleLine = triviaForSingleLine
-                .Where((t, i) => indexOfComment == null
-                    // If no comment, just remove all whitespace
-                    ? !t.IsKind(SyntaxKind.WhitespaceTrivia)
-                    // Otherwise only remove whitespace that comes after the comment
-                    : (i <= indexOfComment.Value || !t.IsKind(SyntaxKind.WhitespaceTrivia))
-                )
-                .Select(t => !t.IsKind(SyntaxKind.SingleLineCommentTrivia)
-                    ? t
-                    // Trailing whitespace after a single line comment is treated as part of the comment text
-                    : TriviaHelpers.TrimTrailingWhitespaceFromSingleLineComment(t)
-                )
-                .ToSyntaxTriviaList();
+            triviaForSingleLine = SyntaxTriviaExtensions.ToSyntaxTriviaList(triviaForSingleLine
+                    .Where((t, i) => indexOfComment == null
+                        // If no comment, just remove all whitespace
+                        ? !t.IsKind(SyntaxKind.WhitespaceTrivia)
+                        // Otherwise only remove whitespace that comes after the comment
+                        : (i <= indexOfComment.Value || !t.IsKind(SyntaxKind.WhitespaceTrivia))
+                    )
+                    .Select(t => !t.IsAnyComment()
+                        ? t
+                        // Trailing whitespace after a single line comment is treated as part of the comment text
+                        : TriviaHelpers.TrimTrailingWhitespaceFromComment(t)
+                    ));
 
             return triviaForSingleLine;
         }
@@ -101,7 +99,7 @@ namespace DotnetNeater.CLI
                 if (trivia.IsKind(SyntaxKind.EndOfLineTrivia))
                 {
                     currentLine.Add(trivia);
-                    result.Add(currentLine.ToSyntaxTriviaList());
+                    result.Add(SyntaxTriviaExtensions.ToSyntaxTriviaList(currentLine));
                     currentLine.Clear();
                 }
                 else
@@ -112,7 +110,7 @@ namespace DotnetNeater.CLI
 
             if (currentLine.Any())
             {
-                result.Add(currentLine.ToSyntaxTriviaList());
+                result.Add(SyntaxTriviaExtensions.ToSyntaxTriviaList(currentLine));
             }
 
             return result;
