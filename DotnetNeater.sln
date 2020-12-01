@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30621.155
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetNeater.CLI", "DotnetNeater.CLI\DotnetNeater.CLI.csproj", "{68F0CCC8-6B2C-42DF-A652-4645EA7A8E7A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotnetNeater.CLI", "DotnetNeater.CLI\DotnetNeater.CLI.csproj", "{68F0CCC8-6B2C-42DF-A652-4645EA7A8E7A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetNeater.Tests", "DotnetNeater.Tests\DotnetNeater.Tests.csproj", "{437C90BE-1155-456D-BE6D-5FA817BCC8C5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{68F0CCC8-6B2C-42DF-A652-4645EA7A8E7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{68F0CCC8-6B2C-42DF-A652-4645EA7A8E7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{68F0CCC8-6B2C-42DF-A652-4645EA7A8E7A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{437C90BE-1155-456D-BE6D-5FA817BCC8C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{437C90BE-1155-456D-BE6D-5FA817BCC8C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{437C90BE-1155-456D-BE6D-5FA817BCC8C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{437C90BE-1155-456D-BE6D-5FA817BCC8C5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

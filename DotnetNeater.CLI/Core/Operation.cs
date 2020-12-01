@@ -81,6 +81,32 @@ namespace DotnetNeater.CLI.Core
             $"nest {Indent} ({Operand.Representation()})";
     }
 
+    public class IndentOperation : Operation
+    {
+        public int Size { get; }
+        
+        public IndentOperation(int size)
+        {
+            Size = size;
+        }
+
+        public override string Representation() =>
+            $"indent {Size}";
+    }
+
+    public class DedentOperation : Operation
+    {
+        public int Size { get; }
+
+        public DedentOperation(int size)
+        {
+            Size = size;
+        }
+
+        public override string Representation() =>
+            $"dedent {Size}";
+    }
+
     public class GroupOperation : Operation
     {
         public Operation Operand { get; }
@@ -92,20 +118,5 @@ namespace DotnetNeater.CLI.Core
 
         public override string Representation() =>
             $"group ({Operand.Representation()})";
-    }
-
-    public class UnionOperation : Operation
-    {
-        public Operation LeftOperand { get; }
-        public Operation RightOperand { get; }
-
-        public UnionOperation(Operation leftOperand, Operation rightOperand)
-        {
-            LeftOperand = leftOperand;
-            RightOperand = rightOperand;
-        }
-
-        public override string Representation() =>
-            $"{LeftOperand.Representation()} <|> ({RightOperand.Representation()})";
     }
 }

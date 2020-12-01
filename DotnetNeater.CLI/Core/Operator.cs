@@ -8,14 +8,6 @@ namespace DotnetNeater.CLI.Core
         {
             return (left, right) switch
             {
-                // (x <|> y) <> z = (x <> z) <|> (y <> z)
-                (UnionOperation leftUnion, _) =>
-                    Union(leftUnion.LeftOperand + right, leftUnion.RightOperand + right),
-
-                // x <> (y <|> z) = (x <> y) <|> (y <|> z)
-                (_, UnionOperation rightUnion) =>
-                    Union(left + rightUnion.LeftOperand, left + rightUnion.RightOperand),
-
                 _ =>
                     new ConcatOperation(left, right)
             };
@@ -58,10 +50,6 @@ namespace DotnetNeater.CLI.Core
             if (operand is ConcatOperation concatOperand)
                 return Concat(Nest(indent, concatOperand.LeftOperand), Nest(indent, concatOperand.RightOperand));
 
-            // nest i (x <|> y) = nest i x <|> nest i y
-            if (operand is UnionOperation unionOperand)
-                return Union(Nest(indent, unionOperand.LeftOperand), Nest(indent, unionOperand.RightOperand));
-
             return new NestOperation(indent, operand);
         }
 
@@ -88,10 +76,6 @@ namespace DotnetNeater.CLI.Core
                 GroupOperation groupOperand =>
                     Flatten(groupOperand.Operand),
 
-                // flatten(x <|> y) = flatten(x)
-                UnionOperation unionOperand =>
-                    Flatten(unionOperand.LeftOperand),
-
                 _ => throw new NotImplementedException($"Flatten({operand.Representation()})"),
             };
         }
@@ -110,12 +94,7 @@ namespace DotnetNeater.CLI.Core
             if (operand is TextOperation textOperand)
                 return textOperand;
 
-            return Union(Flatten(operand), operand);
-        }
-
-        public static Operation Union(Operation leftOperand, Operation rightOperand)
-        {
-            return new UnionOperation(leftOperand, rightOperand);
+            return new GroupOperation(operand);
         }
     }
 }

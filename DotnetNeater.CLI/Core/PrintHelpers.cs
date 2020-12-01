@@ -1,9 +1,183 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace DotnetNeater.CLI.Core
 {
+    public enum BreakMode
+    {
+        Break,
+        Flat,
+    }
+
+    public class Command
+    {
+        public BreakMode BreakMode { get; }
+        public Operation Operation { get; }
+
+        public Command(BreakMode breakMode, Operation operation)
+        {
+            BreakMode = breakMode;
+            Operation = operation;
+        }
+    }
+
     public static class PrintHelpers
     {
+        public static string Print(int preferredLineLength, Operation rootOperation)
+        {
+            var commands = new Stack<Command>();
+            var output = "";
+            
+            var currentIndent = 0;
+            var currentPositionOnLine = 0;
+
+            var shouldRemeasure = false;
+
+            commands.Push(new Command(BreakMode.Break, rootOperation));
+
+            while (commands.Count > 0)
+            {
+                var command = commands.Pop();
+                var operation = command.Operation;
+                var mode = command.BreakMode;
+
+                if (operation is ConcatOperation concatOperation)
+                {
+                    commands.Push(new Command(mode, concatOperation.RightOperand));
+                    commands.Push(new Command(mode, concatOperation.LeftOperand));
+                }
+                else if (operation is NilOperation)
+                {
+                    // Do nothing
+                }
+                else if (operation is TextOperation textOperation)
+                {
+                    output += textOperation.Operand;
+                    currentPositionOnLine += textOperation.Operand.Length;
+                }
+                else if (operation is LineOperation lineOperation)
+                {
+                    if (mode == BreakMode.Flat)
+                    {
+                        output += " "; // TODO - Hard/soft/literal lines
+                        currentPositionOnLine += 1;
+                    }
+                    else
+                    {
+                        output += "\n"; // TODO - Normalised newlines
+                        output += new string(' ', currentIndent);
+                        currentPositionOnLine = currentIndent;
+                    }
+                }
+                else if (operation is NestOperation nestOperation)
+                {
+                    commands.Push(new Command(mode, new DedentOperation(nestOperation.Indent)));
+                    commands.Push(new Command(mode, nestOperation.Operand));
+                    commands.Push(new Command(mode, new IndentOperation(nestOperation.Indent)));
+                }
+                else if (operation is IndentOperation indentOperation)
+                {
+                    currentIndent += indentOperation.Size;
+                }
+                else if (operation is DedentOperation dedentOperation)
+                {
+                    currentIndent -= dedentOperation.Size;
+                }
+                else if (operation is GroupOperation groupOperation)
+                {
+                    if (mode == BreakMode.Flat && !shouldRemeasure)
+                    {
+                        commands.Push(new Command(BreakMode.Flat, groupOperation.Operand));
+                    }
+                    else
+                    {
+                        shouldRemeasure = false;
+
+                        var next = new Command(BreakMode.Flat, groupOperation.Operand);
+                        var remainingSpaceOnLine = preferredLineLength - currentPositionOnLine;
+
+                        if (Fits(next, commands, remainingSpaceOnLine))
+                        {
+                            commands.Push(next);
+                        }
+                        else
+                        {
+                            commands.Push(new Command(BreakMode.Break, groupOperation.Operand));
+                        }
+                    }
+                }
+            }
+
+            return output;
+        }
+
+        private static bool Fits(Command next, Stack<Command> remainingCommands, int remainingSpaceOnLine)
+        {
+            var remainingCommandsList = remainingCommands.ToList();
+            var remainingCommandIndex = remainingCommands.Count;
+
+            var commands = new Stack<Command>();
+            commands.Push(next);
+
+            var output = new List<string>();
+
+            while (remainingSpaceOnLine >= 0)
+            {
+                if (commands.Count == 0)
+                {
+                    if (remainingCommandIndex == 0)
+                    {
+                        return true;
+                    }
+
+                    commands.Push(remainingCommandsList[remainingCommandIndex - 1]);
+                    remainingCommandIndex--;
+                    continue;
+                }
+
+                var command = commands.Pop();
+                var operation = command.Operation;
+                var mode = command.BreakMode;
+
+                if (operation is NilOperation)
+                {
+                    // Do nothing
+                }
+                else if (operation is TextOperation textOperation)
+                {
+                    output.Add(textOperation.Operand);
+                    remainingSpaceOnLine -= textOperation.Operand.Length;
+                }
+                else if (operation is ConcatOperation concatOperation)
+                {
+                    commands.Push(new Command(mode, concatOperation.RightOperand));
+                    commands.Push(new Command(mode, concatOperation.LeftOperand));
+                }
+                else if (operation is NestOperation) { }
+                else if (operation is IndentOperation) { }
+                else if (operation is DedentOperation) { }
+                else if (operation is GroupOperation groupOperation)
+                {
+                    commands.Push(new Command(mode, groupOperation.Operand));
+                }
+                else if (operation is LineOperation)
+                {
+                    if (mode == BreakMode.Flat)
+                    {
+                        output.Add(" ");
+                        remainingSpaceOnLine -= 1;
+                    }
+                    else
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
         public static string Pretty(int preferredLineLength, IDocument document)
         {
             return Best(preferredLineLength, 0, document).Layout();

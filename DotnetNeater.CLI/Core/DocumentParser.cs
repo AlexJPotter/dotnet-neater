@@ -61,11 +61,6 @@ namespace DotnetNeater.CLI.Core
                 }
             }
 
-            if (operation is UnionOperation unionOperation)
-            {
-                return new UnionDocument(ParseOperation(unionOperation.LeftOperand), ParseOperation(unionOperation.RightOperand));
-            }
-
             throw new NotImplementedException($"ParseOperation({operation.Representation()})");
         }
     }
