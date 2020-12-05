@@ -1087,38 +1087,81 @@ namespace DotnetNeater.CLI
 
             if (usingDirective.Alias != null)
             {
-                return Text("using ") + ParseNameEqualsSyntax(usingDirective.Alias) + ParseNameSyntax(usingDirective.Name) + Text(";") + Line();
+                return
+                    ParseToken(usingDirective.UsingKeyword) + Text(" ") + 
+                    ParseNameEqualsSyntax(usingDirective.Alias) + 
+                    ParseNameSyntax(usingDirective.Name) + 
+                    Text(";") + Line();
             }
 
             if (usingDirective.StaticKeyword != default)
             {
-                return Text("using static ") + ParseNameSyntax(usingDirective.Name) + Text(";") + Line();
+                return
+                    ParseToken(usingDirective.UsingKeyword) + Text(" ") +
+                    ParseToken(usingDirective.StaticKeyword) + Text(" ") +
+                    ParseNameSyntax(usingDirective.Name) +
+                    Text(";") + Line();
             }
 
-            return Text("using ") + ParseNameSyntax(usingDirective.Name) + Text(";") + Line();
+            return
+                ParseToken(usingDirective.UsingKeyword) + Text(" ") +
+                ParseNameSyntax(usingDirective.Name) +
+                Text(";") + Line();
+        }
+
+        private static Operation ParseToken(SyntaxToken token, bool removeSpaces = false)
+        {
+            var operation = Text(removeSpaces ? token.Text.WithoutSpaces() : token.Text);
+
+            foreach (var trivia in token.TrailingTrivia)
+            {
+                if (trivia.Kind() == SyntaxKind.SingleLineCommentTrivia)
+                {
+                    operation += LineSuffix(Text(" " + trivia.ToString()));
+                }
+            }
+
+            return operation;
         }
 
         private static Operation ParseNameSyntax(NameSyntax nameSyntax)
         {
             return nameSyntax switch
             {
-                AliasQualifiedNameSyntax aliasQualifiedNameSyntax => throw new NotImplementedException(),
+                AliasQualifiedNameSyntax _ => throw new NotImplementedException(nameof(AliasQualifiedNameSyntax)),
                 GenericNameSyntax genericNameSyntax => ParseGenericNameSyntax(genericNameSyntax),
-                IdentifierNameSyntax identifierNameSyntax => Text(identifierNameSyntax.Identifier.Text.Replace(" ", "")),
-                QualifiedNameSyntax qualifiedNameSyntax => ParseNameSyntax(qualifiedNameSyntax.Left) + Text(".") + ParseNameSyntax(qualifiedNameSyntax.Right),
-                SimpleNameSyntax simpleNameSyntax => Text(simpleNameSyntax.Identifier.Text.Replace(" ", "")),
+                IdentifierNameSyntax identifierNameSyntax => ParseIdentifierNameSyntax(identifierNameSyntax),
+                QualifiedNameSyntax qualifiedNameSyntax => ParseQualifiedNameSyntax(qualifiedNameSyntax),
+                SimpleNameSyntax simpleNameSyntax => ParseSimpleNameSyntax(simpleNameSyntax),
                 _ => throw new ArgumentOutOfRangeException(nameof(nameSyntax))
             };
         }
 
         private static Operation ParseGenericNameSyntax(GenericNameSyntax genericNameSyntax)
         {
-            return Text(genericNameSyntax.Identifier.Text.WithoutSpaces()) + ParseTypeArgumentListSyntax(genericNameSyntax.TypeArgumentList);
+            return
+                ParseToken(genericNameSyntax.Identifier, removeSpaces: true) +
+                ParseTypeArgumentListSyntax(genericNameSyntax.TypeArgumentList);
+        }
+
+        private static Operation ParseIdentifierNameSyntax(IdentifierNameSyntax identifierNameSyntax)
+        {
+            return ParseToken(identifierNameSyntax.Identifier, removeSpaces: true);
+        }
+
+        private static Operation ParseQualifiedNameSyntax(QualifiedNameSyntax qualifiedNameSyntax)
+        {
+            return ParseNameSyntax(qualifiedNameSyntax.Left) + Text(".") + ParseNameSyntax(qualifiedNameSyntax.Right);
+        }
+
+        private static Operation ParseSimpleNameSyntax(SimpleNameSyntax simpleNameSyntax)
+        {
+            return ParseToken(simpleNameSyntax.Identifier, removeSpaces: true);
         }
 
         private static Operation ParseNameEqualsSyntax(NameEqualsSyntax nameEqualsSyntax)
         {
-            return Text($"{nameEqualsSyntax.Name.Identifier.Text.WithoutSpaces()} = ");
+            return ParseIdentifierNameSyntax(nameEqualsSyntax.Name) + Text(" = ");
         }
 
         private static Operation ParseTypeArgumentListSyntax(TypeArgumentListSyntax typeArgumentListSyntax)

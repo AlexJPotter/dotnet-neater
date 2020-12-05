@@ -33,6 +33,31 @@ namespace DotnetNeater.CLI.Core
             return new LineOperation();
         }
 
+        public static Operation SoftLine()
+        {
+            return new LineOperation(isSoft: true);
+        }
+
+        public static Operation HardLine()
+        {
+            return new LineOperation(isHard: true) + new BreakParentOperation();
+        }
+
+        public static Operation LiteralLine()
+        {
+            return new LineOperation(isHard: true, isLiteral: true) + new BreakParentOperation();
+        }
+
+        public static Operation LineSuffix(Operation operation)
+        {
+            return new LineSuffixOperation(operation);
+        }
+
+        public static Operation LineSuffixBoundary()
+        {
+            return new LineSuffixBoundaryOperation();
+        }
+
         public static Operation Nest(int indent, Operation operand)
         {
             if (indent == 0)

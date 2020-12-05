@@ -34,6 +34,8 @@ namespace DotnetNeater.CLI.Core
 
             var shouldRemeasure = false;
 
+            var lineSuffixBuffer = new List<Command>();
+
             commands.Push(new Command(BreakMode.Break, rootOperation));
 
             while (commands.Count > 0)
@@ -58,16 +60,47 @@ namespace DotnetNeater.CLI.Core
                 }
                 else if (operation is LineOperation lineOperation)
                 {
-                    if (mode == BreakMode.Flat)
+                    if (mode == BreakMode.Flat && !lineOperation.IsHard)
                     {
-                        output += " "; // TODO - Hard/soft/literal lines
-                        currentPositionOnLine += 1;
+                        var textToPush = lineOperation.IsSoft ? "" : " ";
+                        output += textToPush;
+                        currentPositionOnLine += textToPush.Length;
                     }
-                    else
+                    else // We're in BreakMode.Break, or BreakMode.Flat but with a Hard Line
                     {
-                        output += "\n"; // TODO - Normalised newlines
-                        output += new string(' ', currentIndent);
-                        currentPositionOnLine = currentIndent;
+                        if (mode == BreakMode.Flat) // The Line must be a Hard Line
+                        {
+                            shouldRemeasure = true;
+                        }
+
+                        if (lineSuffixBuffer.Any())
+                        {
+                            commands.Push(new Command(mode, operation));
+                            FlushLineSuffixBuffer();
+                        }
+                        else if (lineOperation.IsLiteral)
+                        {
+                            // TODO - Do we still need to indent relative to somewhere?
+                            output += "\n"; // TODO - Normalised newlines
+                            currentPositionOnLine = 0;
+                        }
+                        else
+                        {
+                            output += "\n"; // TODO - Normalised newlines
+                            output += new string(' ', currentIndent);
+                            currentPositionOnLine = currentIndent;
+                        }
+                    }
+                }
+                else if (operation is LineSuffixOperation lineSuffixOperation)
+                {
+                    lineSuffixBuffer.Add(new Command(mode, lineSuffixOperation.Operand));
+                }
+                else if (operation is LineSuffixBoundaryOperation)
+                {
+                    if (lineSuffixBuffer.Any())
+                    {
+                        commands.Push(new Command(mode, new LineOperation(isHard: true)));
                     }
                 }
                 else if (operation is NestOperation nestOperation)
@@ -106,6 +139,24 @@ namespace DotnetNeater.CLI.Core
                             commands.Push(new Command(BreakMode.Break, groupOperation.Operand));
                         }
                     }
+                }
+
+                if (!commands.Any() && lineSuffixBuffer.Any())
+                {
+                    FlushLineSuffixBuffer();
+                }
+
+                // Local function
+                void FlushLineSuffixBuffer()
+                {
+                    lineSuffixBuffer.Reverse();
+
+                    foreach (var command in lineSuffixBuffer)
+                    {
+                        commands.Push(command);
+                    }
+
+                    lineSuffixBuffer.Clear();
                 }
             }
 
@@ -161,17 +212,16 @@ namespace DotnetNeater.CLI.Core
                 {
                     commands.Push(new Command(mode, groupOperation.Operand));
                 }
-                else if (operation is LineOperation)
+                else if (operation is LineOperation lineOperation)
                 {
-                    if (mode == BreakMode.Flat)
-                    {
-                        output.Add(" ");
-                        remainingSpaceOnLine -= 1;
-                    }
-                    else
+                    if (mode == BreakMode.Break || lineOperation.IsHard)
                     {
                         return true;
                     }
+
+                    var textToPush = lineOperation.IsSoft ? "" : " ";
+                    output.Add(textToPush);
+                    remainingSpaceOnLine -= textToPush.Length;
                 }
             }
 

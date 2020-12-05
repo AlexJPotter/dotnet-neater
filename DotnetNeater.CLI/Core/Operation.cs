@@ -62,8 +62,38 @@ namespace DotnetNeater.CLI.Core
 
     public class LineOperation : Operation
     {
+        public bool IsSoft { get; }
+        public bool IsHard { get; }
+        public bool IsLiteral { get; }
+
+        public LineOperation(bool isSoft = false, bool isHard = false, bool isLiteral = false)
+        {
+            IsSoft = isSoft;
+            IsHard = isHard;
+            IsLiteral = isLiteral;
+        }
+
         public override string Representation() =>
-            "line";
+            IsSoft ? "soft-line" : IsHard ? "hard-line" : IsLiteral ? "literal-line" : "line";
+    }
+
+    public class LineSuffixOperation : Operation
+    {
+        public Operation Operand { get; }
+
+        public LineSuffixOperation(Operation operand)
+        {
+            Operand = operand;
+        }
+
+        public override string Representation() =>
+            $"line-suffix ({Operand.Representation()})";
+    }
+
+    public class LineSuffixBoundaryOperation : Operation
+    {
+        public override string Representation() =>
+            "line-suffix-boundary";
     }
 
     public class NestOperation : Operation
@@ -118,5 +148,11 @@ namespace DotnetNeater.CLI.Core
 
         public override string Representation() =>
             $"group ({Operand.Representation()})";
+    }
+
+    public class BreakParentOperation : Operation
+    {
+        public override string Representation() =>
+            "break-parent";
     }
 }
