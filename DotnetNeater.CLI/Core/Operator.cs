@@ -68,7 +68,7 @@ namespace DotnetNeater.CLI.Core
                 return operand;
 
             if (operand is NestOperation nestOperand)
-                return Nest(indent + nestOperand.Indent, nestOperand.Operand);
+                return Nest(indent + nestOperand.IndentWidth, nestOperand.Operand);
 
             if (operand is NilOperation nilOperand)
                 return nilOperand;

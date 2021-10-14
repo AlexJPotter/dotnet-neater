@@ -75,6 +75,14 @@ namespace DotnetNeater.CLI.Core
 
         public override string Representation() =>
             IsSoft ? "soft-line" : IsHard ? "hard-line" : IsLiteral ? "literal-line" : "line";
+
+        //  If the line is "soft" it means it doesn't actually logically divide any code, otherwise it does so we should
+        // introduce a space character. For example `users.Select(user => user.Name)` could have a soft line between
+        // `users` and `.Select(user => user.Name)`, but `var name = user.Name` could not have a soft line between `var`
+        // and `name` because the space matters.
+        // TODO - Come up with a better name for stuff (soft/hard/literal)
+        public string GetFlattenedString() =>
+            IsSoft ? "" : " ";
     }
 
     public class LineSuffixOperation : Operation
@@ -98,43 +106,43 @@ namespace DotnetNeater.CLI.Core
 
     public class NestOperation : Operation
     {
-        public int Indent { get; }
+        public int IndentWidth { get; }
         public Operation Operand { get; }
 
-        public NestOperation(int indent, Operation operand)
+        public NestOperation(int indentWidth, Operation operand)
         {
-            Indent = indent;
+            IndentWidth = indentWidth;
             Operand = operand;
         }
 
         public override string Representation() =>
-            $"nest {Indent} ({Operand.Representation()})";
+            $"nest {IndentWidth} ({Operand.Representation()})";
     }
 
     public class IndentOperation : Operation
     {
-        public int Size { get; }
-        
-        public IndentOperation(int size)
+        public int Width { get; }
+
+        public IndentOperation(int width)
         {
-            Size = size;
+            Width = width;
         }
 
         public override string Representation() =>
-            $"indent {Size}";
+            $"indent {Width}";
     }
 
     public class DedentOperation : Operation
     {
-        public int Size { get; }
+        public int Width { get; }
 
-        public DedentOperation(int size)
+        public DedentOperation(int width)
         {
-            Size = size;
+            Width = width;
         }
 
         public override string Representation() =>
-            $"dedent {Size}";
+            $"dedent {Width}";
     }
 
     public class GroupOperation : Operation

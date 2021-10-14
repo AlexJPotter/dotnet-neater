@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DotnetNeater.CLI.Core
+namespace DotnetNeater.CLI.Obsolete
 {
     public interface IDocument
     {

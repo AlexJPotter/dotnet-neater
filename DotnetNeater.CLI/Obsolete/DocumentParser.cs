@@ -1,6 +1,7 @@
 ﻿using System;
+using DotnetNeater.CLI.Core;
 
-namespace DotnetNeater.CLI.Core
+namespace DotnetNeater.CLI.Obsolete
 {
     public static class DocumentParser
     {
@@ -23,10 +24,10 @@ namespace DotnetNeater.CLI.Core
                         new LineDocument(0, ParseOperation(rightOperand)),
 
                     NestOperation nestLeft1 when nestLeft1.Operand is LineOperation =>
-                        new LineDocument(nestLeft1.Indent, ParseOperation(rightOperand)),
+                        new LineDocument(nestLeft1.IndentWidth, ParseOperation(rightOperand)),
 
                     NestOperation nestLeft2 when nestLeft2.Operand is ConcatOperation nestedConcatOperation && nestedConcatOperation.LeftOperand is LineOperation =>
-                        new LineDocument(nestLeft2.Indent, ParseOperation(nestedConcatOperation.RightOperand)),
+                        new LineDocument(nestLeft2.IndentWidth, ParseOperation(nestedConcatOperation.RightOperand)),
 
                     _ =>
                         throw new NotImplementedException($"ParseOperation({operation.Representation()}) : leftOperand = {leftOperand} ; rightOperand = {rightOperand}"),
@@ -52,12 +53,12 @@ namespace DotnetNeater.CLI.Core
             {
                 if (nestOperation.Operand is LineOperation)
                 {
-                    return new LineDocument(nestOperation.Indent, new NilDocument());
+                    return new LineDocument(nestOperation.IndentWidth, new NilDocument());
                 }
 
                 if (nestOperation.Operand is ConcatOperation nestedConcatOperation && nestedConcatOperation.LeftOperand is LineOperation)
                 {
-                    return new LineDocument(nestOperation.Indent, ParseOperation(nestedConcatOperation.RightOperand));
+                    return new LineDocument(nestOperation.IndentWidth, ParseOperation(nestedConcatOperation.RightOperand));
                 }
             }
 

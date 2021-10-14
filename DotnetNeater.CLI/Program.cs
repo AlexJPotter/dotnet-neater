@@ -2,7 +2,6 @@
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using DotnetNeater.CLI.Core;
 using Microsoft.Build.Construction;
 using Microsoft.CodeAnalysis.CSharp;
 
@@ -73,9 +72,10 @@ namespace DotnetNeater.CLI
             var oldSyntaxTree = (CSharpSyntaxTree) CSharpSyntaxTree.ParseText(oldFileContents);
             var oldRootNode = await oldSyntaxTree.GetRootAsync();
 
-            var operationRepresentation = SyntaxTreeParser.GetOperationRepresentation(oldRootNode);
-            var documentRepresentation = DocumentParser.ParseOperation(operationRepresentation);
-            var prettyPrinted = PrintHelpers.Pretty(30, documentRepresentation);
+            var rootOperation = SyntaxTreeParser.GetOperationRepresentation(oldRootNode);
+
+            var printer = Printer.Printer.WithPreferredLineLength(30);
+            var prettyPrinted = printer.Print(rootOperation);
 
             var newSyntaxTree = (CSharpSyntaxTree) CSharpSyntaxTree.ParseText(prettyPrinted);
 

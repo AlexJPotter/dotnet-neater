@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using DotnetNeater.CLI;
 using DotnetNeater.CLI.Core;
+using DotnetNeater.CLI.Printer;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.Extensions.FileProviders;
 using Xunit;
@@ -31,7 +32,8 @@ namespace DotnetNeater.Tests
 
         public static string FormatCode(int preferredLineLength, string code)
         {
-            return PrintHelpers.Print(preferredLineLength, GetRootOperation(code));
+            var printer = Printer.WithPreferredLineLength(preferredLineLength);
+            return printer.Print(GetRootOperation(code));
         }
 
         public static void AssertEqualIgnoringLineEndings(string expected, string actual)
