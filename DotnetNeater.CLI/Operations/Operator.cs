@@ -60,61 +60,39 @@ namespace DotnetNeater.CLI.Operations
         /// <summary>
         /// The nest operation adds indentation to a document.
         /// </summary>
-        /// <param name="indent">The number of spaces by which to indent.</param>
+        /// <param name="width">The number of spaces by which to indent.</param>
         /// <param name="operand"></param>
         /// <returns></returns>
-        public static Operation Nest(int indent, Operation operand)
+        public static Operation Nest(int width, Operation operand)
         {
-            if (indent == 0)
+            if (width == 0)
                 return operand;
 
             if (operand is NestOperation nestOperand)
-                return Nest(indent + nestOperand.IndentWidth, nestOperand.Operand);
+                return Nest(width + nestOperand.IndentWidth, nestOperand.Operand);
 
             if (operand is NilOperation nilOperand)
                 return nilOperand;
 
-            if (operand is TextOperation textOperand)
-                return textOperand;
+            return Indent(width) + operand + Dedent(width);
 
-            if (operand is ConcatOperation concatOperand)
-                return Concat(Nest(indent, concatOperand.LeftOperand), Nest(indent, concatOperand.RightOperand));
-
-            return new NestOperation(indent, operand);
+            // if (operand is TextOperation textOperand)
+            //     return textOperand;
+            //
+            // if (operand is ConcatOperation concatOperand)
+            //     return Concat(Nest(width, concatOperand.LeftOperand), Nest(width, concatOperand.RightOperand));
+            //
+            // return new NestOperation(width, operand);
         }
 
-        /// <summary>
-        /// The flatten operator replaces each line break (and its associated indentation) by a single space. A document
-        /// always represents a non-empty set of layouts, where all layouts in the set flatten to the same layout.
-        /// </summary>
-        /// <param name="operand"></param>
-        /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
-        public static Operation Flatten(Operation operand) // TODO - I'm not sure we need this?
+        public static Operation Indent(int width)
         {
-            return operand switch
-            {
-                ConcatOperation concatOperand =>
-                    Flatten(concatOperand.LeftOperand) + Flatten(concatOperand.RightOperand),
+            return new IndentOperation(width);
+        }
 
-                NilOperation nilOperand =>
-                    nilOperand,
-
-                TextOperation textOperand =>
-                    textOperand,
-
-                LineOperation lineOperation =>
-                    Text(lineOperation.IsSoft ? "" : " "),
-
-                NestOperation nestOperand =>
-                    Flatten(nestOperand.Operand),
-
-                // flatten(group(x)) = flatten(flatten(x) <|> x) = flatten(flatten(x)) = flatten(x)
-                GroupOperation groupOperand =>
-                    Flatten(groupOperand.Operand),
-
-                _ => throw new NotImplementedException($"Flatten({operand.Representation()})"),
-            };
+        public static Operation Dedent(int width)
+        {
+            return new DedentOperation(width);
         }
 
         /// <summary>

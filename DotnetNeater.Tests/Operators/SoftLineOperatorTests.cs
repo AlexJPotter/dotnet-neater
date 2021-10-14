@@ -14,7 +14,7 @@ namespace DotnetNeater.Tests.Operators
             var printer = Printer.WithPreferredLineLength(100);
             var result = printer.Print(rootOperation);
 
-            Assert.Equal("employees\n.Select(x => x.Name);", result);
+            Assert.Equal("employees\r\n.Select(x => x.Name);", result);
         }
 
         [Fact]
@@ -25,7 +25,7 @@ namespace DotnetNeater.Tests.Operators
             var printer = Printer.WithPreferredLineLength(10);
             var result = printer.Print(rootOperation);
 
-            Assert.Equal("employees\n.Select(x => x.Name);", result);
+            Assert.Equal("employees\r\n.Select(x => x.Name);", result);
         }
 
         [Fact]

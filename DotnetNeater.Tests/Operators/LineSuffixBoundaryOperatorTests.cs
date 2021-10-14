@@ -17,7 +17,7 @@ namespace DotnetNeater.Tests.Operators
             var printer = Printer.WithPreferredLineLength(10);
             var result = printer.Print(rootOperation);
 
-            Assert.Equal("One Two // 1, 2\nThree // 3", result);
+            Assert.Equal("One Two // 1, 2\r\nThree // 3", result);
         }
     }
 }

@@ -25,7 +25,7 @@ namespace DotnetNeater.Tests.Operators
             var printer = Printer.WithPreferredLineLength(10);
             var result = printer.Print(rootOperation);
 
-            Assert.Equal("\n  Test", result);
+            Assert.Equal("\r\n  Test", result);
         }
 
         [Fact]
@@ -47,7 +47,7 @@ namespace DotnetNeater.Tests.Operators
             var printer = Printer.WithPreferredLineLength(3);
             var result = printer.Print(rootOperation);
 
-            Assert.Equal("\n  Test", result);
+            Assert.Equal("\r\n  Test", result);
         }
 
         [Fact]
@@ -62,7 +62,7 @@ namespace DotnetNeater.Tests.Operators
             var printer = Printer.WithPreferredLineLength(5);
             var result = printer.Print(rootOperation);
 
-            Assert.Equal("One\n  Two\n    Three", result);
+            Assert.Equal("One\r\n  Two\r\n    Three", result);
         }
     }
 }

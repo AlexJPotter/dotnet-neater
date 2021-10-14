@@ -6,6 +6,8 @@ namespace DotnetNeater.CLI.Printer
 {
     public class Printer
     {
+        public LineEnding LineEndingStyle { get; set; } = LineEnding.Environment;
+
         private readonly int _preferredLineLength;
 
         private PrinterInput _input;
@@ -281,9 +283,12 @@ namespace DotnetNeater.CLI.Printer
             _output.Append(NewLine);
             _cursor.ResetCurrentPositionOnLine();
 
+            // TODO should literal lines still indent relative to somewhere?
             if (!lineOperation.IsLiteral)
             {
-                // TODO should literal lines still indent relative to somewhere?
+                // Note: we only write indentation after new-lines because it only makes sense at the start of new lines
+                // and not just ahead of any text we write. If we naively wrote indentation ahead of every `Text`
+                // operation we'd end up with indentation in the middle of lines.
                 WriteIndentToOutput();
             }
         }
@@ -303,7 +308,18 @@ namespace DotnetNeater.CLI.Printer
             _currentCommand = _input.Read();
         }
 
-        // TODO - Make this configurable somehow?
-        private string NewLine => "\n";
+        private string NewLine
+        {
+            get
+            {
+                return LineEndingStyle switch
+                {
+                    LineEnding.LineFeed => "\n",
+                    LineEnding.CarriageReturnLineFeed => "\r\n",
+                    LineEnding.Environment => Environment.NewLine,
+                    _ => throw new ArgumentException(nameof(LineEndingStyle))
+                };
+            }
+        }
     }
 }
