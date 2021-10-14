@@ -10,11 +10,16 @@ namespace DotnetNeater.CLI.Printer
 
         private PrinterInput _input;
         private PrinterOutput _output = new();
-        private PrinterState _state = new();
+
+        private PrinterCursor _cursor = new();
+
         private LineSuffixBuffer _lineSuffixBuffer = new();
 
-        private Operation CurrentOperation => _state.CurrentCommand.Operation;
-        private BreakMode CurrentBreakMode => _state.CurrentCommand.BreakMode;
+        private PrinterCommand _currentCommand = null;
+        private Operation CurrentOperation => _currentCommand.Operation;
+        private BreakMode CurrentBreakMode => _currentCommand.BreakMode;
+
+        private bool _shouldRemeasure = false;
 
         private Printer(int preferredLineLength)
         {
@@ -30,8 +35,14 @@ namespace DotnetNeater.CLI.Printer
         {
             _input = input;
             _output = new();
-            _state = new();
+
+            _cursor = new();
+
             _lineSuffixBuffer = new();
+
+            _currentCommand = null;
+
+            _shouldRemeasure = false;
         }
 
         public string Print(Operation rootOperation)
@@ -116,7 +127,7 @@ namespace DotnetNeater.CLI.Printer
             {
                 if (CurrentBreakMode == BreakMode.Flat) // The Line must be a Hard Line
                 {
-                    SetShouldRemeasureFlag();
+                    _shouldRemeasure = true;
                 }
 
                 if (_lineSuffixBuffer.Any())
@@ -156,23 +167,23 @@ namespace DotnetNeater.CLI.Printer
 
         private void HandleIndentOperation(IndentOperation indentOperation)
         {
-            _state.IncreaseCurrentIndentWidthBy(indentOperation.Width);
+            _cursor.IncreaseCurrentIndentWidthBy(indentOperation.Width);
         }
 
         private void HandleDedentOperation(DedentOperation dedentOperation)
         {
-            _state.DecreaseCurrentIndentWidthBy(dedentOperation.Width);
+            _cursor.DecreaseCurrentIndentWidthBy(dedentOperation.Width);
         }
 
         private void HandleGroupOperation(GroupOperation groupOperation)
         {
-            if (CurrentBreakMode == BreakMode.Flat && !_state.ShouldRemeasure)
+            if (CurrentBreakMode == BreakMode.Flat && !_shouldRemeasure)
             {
                 AppendToInput(groupOperation.Operand);
             }
             else // (CurrentBreakMode == BreakMode.Hard || state.ShouldRemeasure)
             {
-                ResetShouldRemeasureFlag(); // We're re-measuring!
+                _shouldRemeasure = false;
 
                 var flatCommand = new PrinterCommand(
                     BreakMode.Flat, // We try to lay it out flat
@@ -189,7 +200,7 @@ namespace DotnetNeater.CLI.Printer
         private bool Fits(PrinterCommand next)
         {
             // How much room do we have left on the current line?
-            var remainingSpaceOnLine = _preferredLineLength - _state.CurrentPositionOnLine;
+            var remainingSpaceOnLine = _preferredLineLength - _cursor.CurrentPositionOnLine;
 
             // All the stuff that is still to be placed (not necessarily on the same line)
             // Can we just duplicate the stack?
@@ -262,13 +273,13 @@ namespace DotnetNeater.CLI.Printer
         private void WriteTextToOutput(string text)
         {
             _output.Append(text);
-            _state.IncrementCurrentPositionOnLineBy(text.Length);
+            _cursor.IncrementCurrentPositionOnLineBy(text.Length);
         }
 
         private void WriteNewLineToOutput(LineOperation lineOperation)
         {
             _output.Append(NewLine);
-            _state.ResetCurrentPositionOnLine();
+            _cursor.ResetCurrentPositionOnLine();
 
             if (!lineOperation.IsLiteral)
             {
@@ -279,7 +290,7 @@ namespace DotnetNeater.CLI.Printer
 
         private void WriteIndentToOutput()
         {
-            WriteTextToOutput(new string(' ', _state.CurrentIndentWidth));
+            WriteTextToOutput(new string(' ', _cursor.CurrentIndentWidth));
         }
 
         private void AppendToInput(Operation operation, BreakMode? overrideBreakMode = null)
@@ -289,19 +300,10 @@ namespace DotnetNeater.CLI.Printer
 
         private void LoadNextCommand()
         {
-            _state.LoadNextCommand(_input);
+            _currentCommand = _input.Read();
         }
 
-        private void SetShouldRemeasureFlag()
-        {
-            _state.SetShouldRemeasure(true);
-        }
-        private void ResetShouldRemeasureFlag()
-        {
-            _state.SetShouldRemeasure(false);
-        }
-
-        // TODO - Make this configurable ?
+        // TODO - Make this configurable somehow?
         private string NewLine => "\n";
     }
 }
