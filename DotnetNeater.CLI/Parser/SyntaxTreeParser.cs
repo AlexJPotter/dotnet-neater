@@ -1,14 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using DotnetNeater.CLI.Core;
-using static DotnetNeater.CLI.Core.Operator;
 using DotnetNeater.CLI.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using static DotnetNeater.CLI.Core.Operator;
 
-namespace DotnetNeater.CLI
+namespace DotnetNeater.CLI.Parser
 {
     public static class SyntaxTreeParser
     {

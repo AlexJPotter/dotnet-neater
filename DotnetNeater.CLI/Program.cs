@@ -2,6 +2,8 @@
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using DotnetNeater.CLI.Helpers;
+using DotnetNeater.CLI.Parser;
 using Microsoft.Build.Construction;
 using Microsoft.CodeAnalysis.CSharp;
 
@@ -16,46 +18,7 @@ namespace DotnetNeater.CLI
             Console.WriteLine();
 
             var currentDirectory = Environment.CurrentDirectory;
-
-            var files = Directory.GetFiles(currentDirectory).Select(filePath => new FileInfo(filePath)).ToList();
-
-            var solutionFiles = files.Where(f => f.Extension == ".sln").ToList();
-
-            if (!solutionFiles.Any())
-            {
-                await Console.Error.WriteLineAsync("Could not find a solution file");
-                return;
-            }
-
-            if (solutionFiles.Count > 1)
-            {
-                await Console.Error.WriteLineAsync("Found multiple solution files");
-                return;
-            }
-
-            var solutionFile = SolutionFile.Parse(solutionFiles.Single().FullName);
-
-            var projects = solutionFile.ProjectsInOrder.ToList();
-
-            // TODO - Do this more intelligently
-            var ignoredDirectories = new[] { "\\bin\\", "\\obj\\" };
-
-            var filesToFormat = projects
-                .SelectMany(project =>
-                {
-                    var projectDirectory = Directory.GetParent(project.AbsolutePath);
-
-                    var cSharpFiles = projectDirectory.EnumerateFiles("*.cs", SearchOption.AllDirectories)
-                        .Where(f => !ignoredDirectories.Any(d => f.FullName.Contains(d)))
-                        .ToList();
-
-                    return cSharpFiles;
-                })
-                .Select(fileInfo => fileInfo.FullName)
-                .Distinct()
-                .ToList();
-
-            Console.WriteLine($"Found {filesToFormat.Count} C# files to format ...\r\n");
+            var filesToFormat = FileHelpers.DiscoverFilesToFormat(currentDirectory);
 
             foreach (var filePath in filesToFormat)
             {
@@ -74,7 +37,7 @@ namespace DotnetNeater.CLI
 
             var rootOperation = SyntaxTreeParser.GetOperationRepresentation(oldRootNode);
 
-            var printer = Printer.Printer.WithPreferredLineLength(30);
+            var printer = Printer.Printer.WithPreferredLineLength(30); // TODO - Take preferred line length from config
             var prettyPrinted = printer.Print(rootOperation);
 
             var newSyntaxTree = (CSharpSyntaxTree) CSharpSyntaxTree.ParseText(prettyPrinted);
