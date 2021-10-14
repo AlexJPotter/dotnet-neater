@@ -1088,10 +1088,12 @@ namespace DotnetNeater.CLI
             if (usingDirective.Alias != null)
             {
                 return
-                    ParseToken(usingDirective.UsingKeyword) + Text(" ") + 
-                    ParseNameEqualsSyntax(usingDirective.Alias) + 
-                    ParseNameSyntax(usingDirective.Name) + 
-                    Text(";") + Line();
+                    ParseToken(usingDirective.UsingKeyword) + Text(" ") +
+                    ParseNameEqualsSyntax(usingDirective.Alias) +
+                    ParseNameSyntax(usingDirective.Name) +
+                    Text(";") +
+                    CombineSingleLineCommentsIntoLineSuffix(usingDirective) +
+                    Line();
             }
 
             if (usingDirective.StaticKeyword != default)
@@ -1100,26 +1102,27 @@ namespace DotnetNeater.CLI
                     ParseToken(usingDirective.UsingKeyword) + Text(" ") +
                     ParseToken(usingDirective.StaticKeyword) + Text(" ") +
                     ParseNameSyntax(usingDirective.Name) +
-                    Text(";") + Line();
+                    Text(";") +
+                    CombineSingleLineCommentsIntoLineSuffix(usingDirective) +
+                    Line();
             }
 
             return
                 ParseToken(usingDirective.UsingKeyword) + Text(" ") +
                 ParseNameSyntax(usingDirective.Name) +
-                Text(";") + Line();
+                Text(";") +
+                CombineSingleLineCommentsIntoLineSuffix(usingDirective) +
+                Line();
         }
 
         private static Operation ParseToken(SyntaxToken token, bool removeSpaces = false)
         {
             var operation = Text(removeSpaces ? token.Text.WithoutSpaces() : token.Text);
 
-            foreach (var trivia in token.TrailingTrivia)
-            {
-                if (trivia.Kind() == SyntaxKind.SingleLineCommentTrivia)
-                {
-                    operation += LineSuffix(Text(" " + trivia.ToString()));
-                }
-            }
+            // foreach (var trivia in token.TrailingTrivia.Where(t => t.Kind() == SyntaxKind.SingleLineCommentTrivia))
+            // {
+            //     operation += LineSuffix(Text(" " + trivia));
+            // }
 
             return operation;
         }
@@ -1199,6 +1202,23 @@ namespace DotnetNeater.CLI
                 TupleTypeSyntax tupleTypeSyntax => throw new NotImplementedException(),
                 _ => throw new ArgumentOutOfRangeException(nameof(typeSyntax))
             };
+        }
+
+        private static Operation CombineSingleLineCommentsIntoLineSuffix(CSharpSyntaxNode syntaxNode)
+        {
+            var commentText = " //";
+
+            var trivia =
+                syntaxNode.DescendantTrivia()
+                    .Where(t => t.Kind() == SyntaxKind.SingleLineCommentTrivia)
+                    .ToList();
+
+            foreach (var singleLineCommentTrivia in trivia)
+            {
+                commentText += " " + singleLineCommentTrivia.ToString()["//".Length..].Trim();
+            }
+
+            return LineSuffix(Text(commentText));
         }
     }
 }

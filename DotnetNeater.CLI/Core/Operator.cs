@@ -6,11 +6,7 @@ namespace DotnetNeater.CLI.Core
     {
         public static Operation Concat(Operation left, Operation right)
         {
-            return (left, right) switch
-            {
-                _ =>
-                    new ConcatOperation(left, right)
-            };
+            return new ConcatOperation(left, right);
         }
 
         public static Operation Nil()
@@ -48,16 +44,24 @@ namespace DotnetNeater.CLI.Core
             return new LineOperation(isHard: true, isLiteral: true) + new BreakParentOperation();
         }
 
+        // Used for trailing comments and stuff
         public static Operation LineSuffix(Operation operation)
         {
             return new LineSuffixOperation(operation);
         }
 
+        // Used to create a hard break in a line suffix
         public static Operation LineSuffixBoundary()
         {
             return new LineSuffixBoundaryOperation();
         }
 
+        /// <summary>
+        /// The nest operation adds indentation to a document.
+        /// </summary>
+        /// <param name="indent">The number of spaces by which to indent.</param>
+        /// <param name="operand"></param>
+        /// <returns></returns>
         public static Operation Nest(int indent, Operation operand)
         {
             if (indent == 0)
@@ -78,6 +82,13 @@ namespace DotnetNeater.CLI.Core
             return new NestOperation(indent, operand);
         }
 
+        /// <summary>
+        /// The flatten operator replaces each line break (and its associated indentation) by a single space. A document
+        /// always represents a non-empty set of layouts, where all layouts in the set flatten to the same layout.
+        /// </summary>
+        /// <param name="operand"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
         public static Operation Flatten(Operation operand)
         {
             return operand switch
@@ -91,8 +102,8 @@ namespace DotnetNeater.CLI.Core
                 TextOperation textOperand =>
                     textOperand,
 
-                LineOperation _ =>
-                    Text(" "), // TODO - Determine what this should be for different types of line break
+                LineOperation lineOperation =>
+                    Text(lineOperation.IsSoft ? "" : " "),
 
                 NestOperation nestOperand =>
                     Flatten(nestOperand.Operand),
@@ -105,6 +116,13 @@ namespace DotnetNeater.CLI.Core
             };
         }
 
+        /// <summary>
+        /// Given a document, representing a set of layouts, group returns the set with one new element added,
+        /// representing the layout in which everything is compressed on one line. This is achieved by replacing each
+        /// newline (and the corresponding indentation) with text consisting of a single space.
+        /// </summary>
+        /// <param name="operand"></param>
+        /// <returns></returns>
         public static Operation Group(Operation operand)
         {
             // group(text(s) <> x) = text(s) <> group(x)

@@ -1,13 +1,6 @@
 using Xunit;
-using Microsoft.CodeAnalysis.CSharp;
 using DotnetNeater.CLI.Core;
 using static DotnetNeater.CLI.Core.Operator;
-using DotnetNeater.CLI;
-
-using     // something here   
-    static  //   fooooobar
-  System. Collections. // gah
-Generic.List<int>;
 
 namespace DotnetNeater.Tests
 {
@@ -54,40 +47,6 @@ namespace DotnetNeater.Tests
             Assert.Equal("hello ab\nc\nd", PrintHelpers.Print(8, operation));
             Assert.Equal("hello abc\nd", PrintHelpers.Print(9, operation));
             Assert.Equal("hello abcd", PrintHelpers.Print(10, operation));
-        }
-
-        [Fact]
-        public void Test3()
-        {
-            var code = @"
-using // my comment
-    System;
-
-";
-
-            var syntaxTree = (CSharpSyntaxTree)CSharpSyntaxTree.ParseText(code);
-
-            var operation = SyntaxTreeParser.GetOperationRepresentation(syntaxTree.GetRoot());
-
-            Assert.Equal("using System; // my comment\n", PrintHelpers.Print(30, operation));
-        }
-
-        [Fact]
-        public void Test4()
-        {
-            var code = @"using // first comment
-    static  // second comment
-  System. Collections. // third comment
-Generic.List<int>;";
-
-            var syntaxTree = (CSharpSyntaxTree)CSharpSyntaxTree.ParseText(code);
-
-            var operation = SyntaxTreeParser.GetOperationRepresentation(syntaxTree.GetRoot());
-
-            Assert.Equal(
-                "using static System.Collections.Generic.List<int>; // first comment // second comment // third comment\n",
-                PrintHelpers.Print(30, operation)
-            );
         }
     }
 }
