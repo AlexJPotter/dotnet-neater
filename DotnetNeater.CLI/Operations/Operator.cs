@@ -1,7 +1,8 @@
 ﻿using System;
 
-namespace DotnetNeater.CLI.Core
+namespace DotnetNeater.CLI.Operations
 {
+    // Convenience methods for instantiating and combining Operations
     public static class Operator
     {
         public static Operation Concat(Operation left, Operation right)
@@ -89,7 +90,7 @@ namespace DotnetNeater.CLI.Core
         /// <param name="operand"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public static Operation Flatten(Operation operand)
+        public static Operation Flatten(Operation operand) // TODO - I'm not sure we need this?
         {
             return operand switch
             {

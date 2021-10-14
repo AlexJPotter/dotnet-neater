@@ -1,5 +1,5 @@
 ﻿using System;
-using DotnetNeater.CLI.Core;
+using DotnetNeater.CLI.Operations;
 
 namespace DotnetNeater.CLI.Obsolete
 {

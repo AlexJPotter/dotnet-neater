@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Linq;
-using DotnetNeater.CLI.Core;
 using DotnetNeater.CLI.Extensions;
+using DotnetNeater.CLI.Operations;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using static DotnetNeater.CLI.Core.Operator;
+using static DotnetNeater.CLI.Operations.Operator;
 
 namespace DotnetNeater.CLI.Parser
 {

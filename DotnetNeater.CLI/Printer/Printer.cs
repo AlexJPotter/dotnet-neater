@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using DotnetNeater.CLI.Core;
+using DotnetNeater.CLI.Operations;
 
 namespace DotnetNeater.CLI.Printer
 {

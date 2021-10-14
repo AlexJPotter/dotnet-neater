@@ -1,6 +1,6 @@
 ﻿using System.IO;
 using DotnetNeater.CLI;
-using DotnetNeater.CLI.Core;
+using DotnetNeater.CLI.Operations;
 using DotnetNeater.CLI.Parser;
 using DotnetNeater.CLI.Printer;
 using Microsoft.CodeAnalysis.CSharp;
