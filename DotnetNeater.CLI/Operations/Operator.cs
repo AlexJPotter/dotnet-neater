@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace DotnetNeater.CLI.Operations
 {
@@ -117,6 +118,23 @@ namespace DotnetNeater.CLI.Operations
                 return textOperand;
 
             return new GroupOperation(operand);
+        }
+
+        public static Operation Join(Operation separator, IList<Operation> operations)
+        {
+            var aggregate = Nil();
+
+            for (var index = 0; index < operations.Count; index++)
+            {
+                if (index > 0)
+                {
+                    aggregate += separator;
+                }
+
+                aggregate += operations[index];
+            }
+
+            return aggregate;
         }
     }
 }

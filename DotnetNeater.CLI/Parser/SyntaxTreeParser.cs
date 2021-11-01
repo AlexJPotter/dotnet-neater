@@ -1,8 +1,14 @@
 ﻿using System;
 using System.Linq;
-using DotnetNeater.CLI.Extensions;
 using DotnetNeater.CLI.Operations;
-using Microsoft.CodeAnalysis;
+using DotnetNeater.CLI.Parser.Declarations;
+using DotnetNeater.CLI.Parser.Declarators;
+using DotnetNeater.CLI.Parser.Directives;
+using DotnetNeater.CLI.Parser.Expressions;
+using DotnetNeater.CLI.Parser.Names;
+using DotnetNeater.CLI.Parser.Other;
+using DotnetNeater.CLI.Parser.Statements;
+using DotnetNeater.CLI.Parser.Types;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static DotnetNeater.CLI.Operations.Operator;
@@ -11,7 +17,7 @@ namespace DotnetNeater.CLI.Parser
 {
     public static class SyntaxTreeParser
     {
-        public static Operation GetOperationRepresentation(CSharpSyntaxNode syntaxNode)
+        public static Operation Parse(CSharpSyntaxNode syntaxNode)
         {
             var nodeKind = syntaxNode.Kind();
 
@@ -22,453 +28,231 @@ namespace DotnetNeater.CLI.Parser
                 case SyntaxKind.List:
                     break;
                 case SyntaxKind.TildeToken:
-                    break;
                 case SyntaxKind.ExclamationToken:
-                    break;
                 case SyntaxKind.DollarToken:
-                    break;
                 case SyntaxKind.PercentToken:
-                    break;
                 case SyntaxKind.CaretToken:
-                    break;
                 case SyntaxKind.AmpersandToken:
-                    break;
                 case SyntaxKind.AsteriskToken:
-                    break;
                 case SyntaxKind.OpenParenToken:
-                    break;
                 case SyntaxKind.CloseParenToken:
-                    break;
                 case SyntaxKind.MinusToken:
-                    break;
                 case SyntaxKind.PlusToken:
-                    break;
                 case SyntaxKind.EqualsToken:
-                    break;
                 case SyntaxKind.OpenBraceToken:
-                    break;
                 case SyntaxKind.CloseBraceToken:
-                    break;
                 case SyntaxKind.OpenBracketToken:
-                    break;
                 case SyntaxKind.CloseBracketToken:
-                    break;
                 case SyntaxKind.BarToken:
-                    break;
                 case SyntaxKind.BackslashToken:
-                    break;
                 case SyntaxKind.ColonToken:
-                    break;
                 case SyntaxKind.SemicolonToken:
-                    break;
                 case SyntaxKind.DoubleQuoteToken:
-                    break;
                 case SyntaxKind.SingleQuoteToken:
-                    break;
                 case SyntaxKind.LessThanToken:
-                    break;
                 case SyntaxKind.CommaToken:
-                    break;
                 case SyntaxKind.GreaterThanToken:
-                    break;
                 case SyntaxKind.DotToken:
-                    break;
                 case SyntaxKind.QuestionToken:
-                    break;
                 case SyntaxKind.HashToken:
-                    break;
                 case SyntaxKind.SlashToken:
-                    break;
                 case SyntaxKind.DotDotToken:
-                    break;
                 case SyntaxKind.SlashGreaterThanToken:
-                    break;
                 case SyntaxKind.LessThanSlashToken:
-                    break;
                 case SyntaxKind.XmlCommentStartToken:
-                    break;
                 case SyntaxKind.XmlCommentEndToken:
-                    break;
                 case SyntaxKind.XmlCDataStartToken:
-                    break;
                 case SyntaxKind.XmlCDataEndToken:
-                    break;
                 case SyntaxKind.XmlProcessingInstructionStartToken:
-                    break;
                 case SyntaxKind.XmlProcessingInstructionEndToken:
-                    break;
                 case SyntaxKind.BarBarToken:
-                    break;
                 case SyntaxKind.AmpersandAmpersandToken:
-                    break;
                 case SyntaxKind.MinusMinusToken:
-                    break;
                 case SyntaxKind.PlusPlusToken:
-                    break;
                 case SyntaxKind.ColonColonToken:
-                    break;
                 case SyntaxKind.QuestionQuestionToken:
-                    break;
                 case SyntaxKind.MinusGreaterThanToken:
-                    break;
                 case SyntaxKind.ExclamationEqualsToken:
-                    break;
                 case SyntaxKind.EqualsEqualsToken:
-                    break;
                 case SyntaxKind.EqualsGreaterThanToken:
-                    break;
                 case SyntaxKind.LessThanEqualsToken:
-                    break;
                 case SyntaxKind.LessThanLessThanToken:
-                    break;
                 case SyntaxKind.LessThanLessThanEqualsToken:
-                    break;
                 case SyntaxKind.GreaterThanEqualsToken:
-                    break;
                 case SyntaxKind.GreaterThanGreaterThanToken:
-                    break;
                 case SyntaxKind.GreaterThanGreaterThanEqualsToken:
-                    break;
                 case SyntaxKind.SlashEqualsToken:
-                    break;
                 case SyntaxKind.AsteriskEqualsToken:
-                    break;
                 case SyntaxKind.BarEqualsToken:
-                    break;
                 case SyntaxKind.AmpersandEqualsToken:
-                    break;
                 case SyntaxKind.PlusEqualsToken:
-                    break;
                 case SyntaxKind.MinusEqualsToken:
-                    break;
                 case SyntaxKind.CaretEqualsToken:
-                    break;
                 case SyntaxKind.PercentEqualsToken:
-                    break;
                 case SyntaxKind.QuestionQuestionEqualsToken:
-                    break;
-                case SyntaxKind.BoolKeyword:
-                    break;
-                case SyntaxKind.ByteKeyword:
-                    break;
-                case SyntaxKind.SByteKeyword:
-                    break;
-                case SyntaxKind.ShortKeyword:
-                    break;
-                case SyntaxKind.UShortKeyword:
-                    break;
-                case SyntaxKind.IntKeyword:
-                    break;
-                case SyntaxKind.UIntKeyword:
-                    break;
-                case SyntaxKind.LongKeyword:
-                    break;
-                case SyntaxKind.ULongKeyword:
-                    break;
-                case SyntaxKind.DoubleKeyword:
-                    break;
-                case SyntaxKind.FloatKeyword:
-                    break;
-                case SyntaxKind.DecimalKeyword:
-                    break;
-                case SyntaxKind.StringKeyword:
-                    break;
-                case SyntaxKind.CharKeyword:
-                    break;
-                case SyntaxKind.VoidKeyword:
-                    break;
-                case SyntaxKind.ObjectKeyword:
-                    break;
-                case SyntaxKind.TypeOfKeyword:
-                    break;
-                case SyntaxKind.SizeOfKeyword:
-                    break;
-                case SyntaxKind.NullKeyword:
-                    break;
-                case SyntaxKind.TrueKeyword:
-                    break;
-                case SyntaxKind.FalseKeyword:
-                    break;
-                case SyntaxKind.IfKeyword:
-                    break;
-                case SyntaxKind.ElseKeyword:
-                    break;
-                case SyntaxKind.WhileKeyword:
-                    break;
-                case SyntaxKind.ForKeyword:
-                    break;
-                case SyntaxKind.ForEachKeyword:
-                    break;
-                case SyntaxKind.DoKeyword:
-                    break;
-                case SyntaxKind.SwitchKeyword:
-                    break;
-                case SyntaxKind.CaseKeyword:
-                    break;
-                case SyntaxKind.DefaultKeyword:
-                    break;
-                case SyntaxKind.TryKeyword:
-                    break;
-                case SyntaxKind.CatchKeyword:
-                    break;
-                case SyntaxKind.FinallyKeyword:
-                    break;
-                case SyntaxKind.LockKeyword:
-                    break;
-                case SyntaxKind.GotoKeyword:
-                    break;
-                case SyntaxKind.BreakKeyword:
-                    break;
-                case SyntaxKind.ContinueKeyword:
-                    break;
-                case SyntaxKind.ReturnKeyword:
-                    break;
-                case SyntaxKind.ThrowKeyword:
-                    break;
-                case SyntaxKind.PublicKeyword:
-                    break;
-                case SyntaxKind.PrivateKeyword:
-                    break;
-                case SyntaxKind.InternalKeyword:
-                    break;
-                case SyntaxKind.ProtectedKeyword:
-                    break;
-                case SyntaxKind.StaticKeyword:
-                    break;
-                case SyntaxKind.ReadOnlyKeyword:
-                    break;
-                case SyntaxKind.SealedKeyword:
-                    break;
-                case SyntaxKind.ConstKeyword:
-                    break;
-                case SyntaxKind.FixedKeyword:
-                    break;
-                case SyntaxKind.StackAllocKeyword:
-                    break;
-                case SyntaxKind.VolatileKeyword:
-                    break;
-                case SyntaxKind.NewKeyword:
-                    break;
-                case SyntaxKind.OverrideKeyword:
-                    break;
-                case SyntaxKind.AbstractKeyword:
-                    break;
-                case SyntaxKind.VirtualKeyword:
-                    break;
-                case SyntaxKind.EventKeyword:
-                    break;
-                case SyntaxKind.ExternKeyword:
-                    break;
-                case SyntaxKind.RefKeyword:
-                    break;
-                case SyntaxKind.OutKeyword:
-                    break;
-                case SyntaxKind.InKeyword:
-                    break;
-                case SyntaxKind.IsKeyword:
-                    break;
-                case SyntaxKind.AsKeyword:
-                    break;
-                case SyntaxKind.ParamsKeyword:
-                    break;
-                case SyntaxKind.ArgListKeyword:
-                    break;
-                case SyntaxKind.MakeRefKeyword:
-                    break;
-                case SyntaxKind.RefTypeKeyword:
-                    break;
-                case SyntaxKind.RefValueKeyword:
-                    break;
-                case SyntaxKind.ThisKeyword:
-                    break;
-                case SyntaxKind.BaseKeyword:
-                    break;
-                case SyntaxKind.NamespaceKeyword:
-                    break;
-                case SyntaxKind.UsingKeyword:
-                    break;
-                case SyntaxKind.ClassKeyword:
-                    break;
-                case SyntaxKind.StructKeyword:
-                    break;
-                case SyntaxKind.InterfaceKeyword:
-                    break;
-                case SyntaxKind.EnumKeyword:
-                    break;
-                case SyntaxKind.DelegateKeyword:
-                    break;
-                case SyntaxKind.CheckedKeyword:
-                    break;
-                case SyntaxKind.UncheckedKeyword:
-                    break;
-                case SyntaxKind.UnsafeKeyword:
-                    break;
-                case SyntaxKind.OperatorKeyword:
-                    break;
-                case SyntaxKind.ExplicitKeyword:
-                    break;
-                case SyntaxKind.ImplicitKeyword:
-                    break;
-                case SyntaxKind.YieldKeyword:
-                    break;
-                case SyntaxKind.PartialKeyword:
-                    break;
-                case SyntaxKind.AliasKeyword:
-                    break;
-                case SyntaxKind.GlobalKeyword:
-                    break;
-                case SyntaxKind.AssemblyKeyword:
-                    break;
-                case SyntaxKind.ModuleKeyword:
-                    break;
-                case SyntaxKind.TypeKeyword:
-                    break;
-                case SyntaxKind.FieldKeyword:
-                    break;
-                case SyntaxKind.MethodKeyword:
-                    break;
-                case SyntaxKind.ParamKeyword:
-                    break;
-                case SyntaxKind.PropertyKeyword:
-                    break;
-                case SyntaxKind.TypeVarKeyword:
-                    break;
-                case SyntaxKind.GetKeyword:
-                    break;
-                case SyntaxKind.SetKeyword:
-                    break;
-                case SyntaxKind.AddKeyword:
-                    break;
-                case SyntaxKind.RemoveKeyword:
-                    break;
-                case SyntaxKind.WhereKeyword:
-                    break;
-                case SyntaxKind.FromKeyword:
-                    break;
-                case SyntaxKind.GroupKeyword:
-                    break;
-                case SyntaxKind.JoinKeyword:
-                    break;
-                case SyntaxKind.IntoKeyword:
-                    break;
-                case SyntaxKind.LetKeyword:
-                    break;
-                case SyntaxKind.ByKeyword:
-                    break;
-                case SyntaxKind.SelectKeyword:
-                    break;
-                case SyntaxKind.OrderByKeyword:
-                    break;
-                case SyntaxKind.OnKeyword:
-                    break;
-                case SyntaxKind.EqualsKeyword:
-                    break;
-                case SyntaxKind.AscendingKeyword:
-                    break;
-                case SyntaxKind.DescendingKeyword:
-                    break;
-                case SyntaxKind.NameOfKeyword:
-                    break;
-                case SyntaxKind.AsyncKeyword:
-                    break;
-                case SyntaxKind.AwaitKeyword:
-                    break;
-                case SyntaxKind.WhenKeyword:
-                    break;
-                case SyntaxKind.OrKeyword:
-                    break;
-                case SyntaxKind.AndKeyword:
-                    break;
-                case SyntaxKind.NotKeyword:
-                    break;
-                case SyntaxKind.DataKeyword:
-                    break;
-                case SyntaxKind.WithKeyword:
-                    break;
-                case SyntaxKind.InitKeyword:
-                    break;
-                case SyntaxKind.RecordKeyword:
-                    break;
-                case SyntaxKind.ElifKeyword:
-                    break;
-                case SyntaxKind.EndIfKeyword:
-                    break;
-                case SyntaxKind.RegionKeyword:
-                    break;
-                case SyntaxKind.EndRegionKeyword:
-                    break;
-                case SyntaxKind.DefineKeyword:
-                    break;
-                case SyntaxKind.UndefKeyword:
-                    break;
-                case SyntaxKind.WarningKeyword:
-                    break;
-                case SyntaxKind.ErrorKeyword:
-                    break;
-                case SyntaxKind.LineKeyword:
-                    break;
-                case SyntaxKind.PragmaKeyword:
-                    break;
-                case SyntaxKind.HiddenKeyword:
-                    break;
-                case SyntaxKind.ChecksumKeyword:
-                    break;
-                case SyntaxKind.DisableKeyword:
-                    break;
-                case SyntaxKind.RestoreKeyword:
-                    break;
-                case SyntaxKind.ReferenceKeyword:
-                    break;
                 case SyntaxKind.InterpolatedStringStartToken:
-                    break;
                 case SyntaxKind.InterpolatedStringEndToken:
-                    break;
                 case SyntaxKind.InterpolatedVerbatimStringStartToken:
-                    break;
-                case SyntaxKind.LoadKeyword:
-                    break;
-                case SyntaxKind.NullableKeyword:
-                    break;
-                case SyntaxKind.EnableKeyword:
-                    break;
-                case SyntaxKind.WarningsKeyword:
-                    break;
-                case SyntaxKind.AnnotationsKeyword:
-                    break;
-                case SyntaxKind.VarKeyword:
-                    break;
                 case SyntaxKind.UnderscoreToken:
-                    break;
                 case SyntaxKind.OmittedTypeArgumentToken:
-                    break;
                 case SyntaxKind.OmittedArraySizeExpressionToken:
-                    break;
                 case SyntaxKind.EndOfDirectiveToken:
-                    break;
                 case SyntaxKind.EndOfDocumentationCommentToken:
-                    break;
                 case SyntaxKind.EndOfFileToken:
-                    break;
                 case SyntaxKind.BadToken:
-                    break;
                 case SyntaxKind.IdentifierToken:
-                    break;
                 case SyntaxKind.NumericLiteralToken:
-                    break;
                 case SyntaxKind.CharacterLiteralToken:
-                    break;
                 case SyntaxKind.StringLiteralToken:
-                    break;
                 case SyntaxKind.XmlEntityLiteralToken:
-                    break;
                 case SyntaxKind.XmlTextLiteralToken:
-                    break;
                 case SyntaxKind.XmlTextLiteralNewLineToken:
-                    break;
                 case SyntaxKind.InterpolatedStringToken:
-                    break;
                 case SyntaxKind.InterpolatedStringTextToken:
-                    break;
+                    return Text(syntaxNode.GetText().ToString().Trim());
+                case SyntaxKind.BoolKeyword:
+                case SyntaxKind.ByteKeyword:
+                case SyntaxKind.SByteKeyword:
+                case SyntaxKind.ShortKeyword:
+                case SyntaxKind.UShortKeyword:
+                case SyntaxKind.IntKeyword:
+                case SyntaxKind.UIntKeyword:
+                case SyntaxKind.LongKeyword:
+                case SyntaxKind.ULongKeyword:
+                case SyntaxKind.DoubleKeyword:
+                case SyntaxKind.FloatKeyword:
+                case SyntaxKind.DecimalKeyword:
+                case SyntaxKind.StringKeyword:
+                case SyntaxKind.CharKeyword:
+                case SyntaxKind.VoidKeyword:
+                case SyntaxKind.ObjectKeyword:
+                case SyntaxKind.TypeOfKeyword:
+                case SyntaxKind.SizeOfKeyword:
+                case SyntaxKind.NullKeyword:
+                case SyntaxKind.TrueKeyword:
+                case SyntaxKind.FalseKeyword:
+                case SyntaxKind.IfKeyword:
+                case SyntaxKind.ElseKeyword:
+                case SyntaxKind.WhileKeyword:
+                case SyntaxKind.ForKeyword:
+                case SyntaxKind.ForEachKeyword:
+                case SyntaxKind.DoKeyword:
+                case SyntaxKind.SwitchKeyword:
+                case SyntaxKind.CaseKeyword:
+                case SyntaxKind.DefaultKeyword:
+                case SyntaxKind.TryKeyword:
+                case SyntaxKind.CatchKeyword:
+                case SyntaxKind.FinallyKeyword:
+                case SyntaxKind.LockKeyword:
+                case SyntaxKind.GotoKeyword:
+                case SyntaxKind.BreakKeyword:
+                case SyntaxKind.ContinueKeyword:
+                case SyntaxKind.ReturnKeyword:
+                case SyntaxKind.ThrowKeyword:
+                case SyntaxKind.PublicKeyword:
+                case SyntaxKind.PrivateKeyword:
+                case SyntaxKind.InternalKeyword:
+                case SyntaxKind.ProtectedKeyword:
+                case SyntaxKind.StaticKeyword:
+                case SyntaxKind.ReadOnlyKeyword:
+                case SyntaxKind.SealedKeyword:
+                case SyntaxKind.ConstKeyword:
+                case SyntaxKind.FixedKeyword:
+                case SyntaxKind.StackAllocKeyword:
+                case SyntaxKind.VolatileKeyword:
+                case SyntaxKind.NewKeyword:
+                case SyntaxKind.OverrideKeyword:
+                case SyntaxKind.AbstractKeyword:
+                case SyntaxKind.VirtualKeyword:
+                case SyntaxKind.EventKeyword:
+                case SyntaxKind.ExternKeyword:
+                case SyntaxKind.RefKeyword:
+                case SyntaxKind.OutKeyword:
+                case SyntaxKind.InKeyword:
+                case SyntaxKind.IsKeyword:
+                case SyntaxKind.AsKeyword:
+                case SyntaxKind.ParamsKeyword:
+                case SyntaxKind.ArgListKeyword:
+                case SyntaxKind.MakeRefKeyword:
+                case SyntaxKind.RefTypeKeyword:
+                case SyntaxKind.RefValueKeyword:
+                case SyntaxKind.ThisKeyword:
+                case SyntaxKind.BaseKeyword:
+                case SyntaxKind.NamespaceKeyword:
+                case SyntaxKind.UsingKeyword:
+                case SyntaxKind.ClassKeyword:
+                case SyntaxKind.StructKeyword:
+                case SyntaxKind.InterfaceKeyword:
+                case SyntaxKind.EnumKeyword:
+                case SyntaxKind.DelegateKeyword:
+                case SyntaxKind.CheckedKeyword:
+                case SyntaxKind.UncheckedKeyword:
+                case SyntaxKind.UnsafeKeyword:
+                case SyntaxKind.OperatorKeyword:
+                case SyntaxKind.ExplicitKeyword:
+                case SyntaxKind.ImplicitKeyword:
+                case SyntaxKind.YieldKeyword:
+                case SyntaxKind.PartialKeyword:
+                case SyntaxKind.AliasKeyword:
+                case SyntaxKind.GlobalKeyword:
+                case SyntaxKind.AssemblyKeyword:
+                case SyntaxKind.ModuleKeyword:
+                case SyntaxKind.TypeKeyword:
+                case SyntaxKind.FieldKeyword:
+                case SyntaxKind.MethodKeyword:
+                case SyntaxKind.ParamKeyword:
+                case SyntaxKind.PropertyKeyword:
+                case SyntaxKind.TypeVarKeyword:
+                case SyntaxKind.GetKeyword:
+                case SyntaxKind.SetKeyword:
+                case SyntaxKind.AddKeyword:
+                case SyntaxKind.RemoveKeyword:
+                case SyntaxKind.WhereKeyword:
+                case SyntaxKind.FromKeyword:
+                case SyntaxKind.GroupKeyword:
+                case SyntaxKind.JoinKeyword:
+                case SyntaxKind.IntoKeyword:
+                case SyntaxKind.LetKeyword:
+                case SyntaxKind.ByKeyword:
+                case SyntaxKind.SelectKeyword:
+                case SyntaxKind.OrderByKeyword:
+                case SyntaxKind.OnKeyword:
+                case SyntaxKind.EqualsKeyword:
+                case SyntaxKind.AscendingKeyword:
+                case SyntaxKind.DescendingKeyword:
+                case SyntaxKind.NameOfKeyword:
+                case SyntaxKind.AsyncKeyword:
+                case SyntaxKind.AwaitKeyword:
+                case SyntaxKind.WhenKeyword:
+                case SyntaxKind.OrKeyword:
+                case SyntaxKind.AndKeyword:
+                case SyntaxKind.NotKeyword:
+                case SyntaxKind.DataKeyword:
+                case SyntaxKind.WithKeyword:
+                case SyntaxKind.InitKeyword:
+                case SyntaxKind.RecordKeyword:
+                case SyntaxKind.ElifKeyword:
+                case SyntaxKind.EndIfKeyword:
+                case SyntaxKind.RegionKeyword:
+                case SyntaxKind.EndRegionKeyword:
+                case SyntaxKind.DefineKeyword:
+                case SyntaxKind.UndefKeyword:
+                case SyntaxKind.WarningKeyword:
+                case SyntaxKind.ErrorKeyword:
+                case SyntaxKind.LineKeyword:
+                case SyntaxKind.PragmaKeyword:
+                case SyntaxKind.HiddenKeyword:
+                case SyntaxKind.ChecksumKeyword:
+                case SyntaxKind.DisableKeyword:
+                case SyntaxKind.RestoreKeyword:
+                case SyntaxKind.ReferenceKeyword:
+                case SyntaxKind.LoadKeyword:
+                case SyntaxKind.NullableKeyword:
+                case SyntaxKind.EnableKeyword:
+                case SyntaxKind.WarningsKeyword:
+                case SyntaxKind.AnnotationsKeyword:
+                case SyntaxKind.VarKeyword:
+                    return Text(syntaxNode.GetText().ToString().Trim());
                 case SyntaxKind.EndOfLineTrivia:
                     break;
                 case SyntaxKind.WhitespaceTrivia:
@@ -566,17 +350,17 @@ namespace DotnetNeater.CLI.Parser
                 case SyntaxKind.CrefParameter:
                     break;
                 case SyntaxKind.IdentifierName:
-                    break;
+                    return IdentifierNameParser.Parse((IdentifierNameSyntax) syntaxNode);
                 case SyntaxKind.QualifiedName:
-                    break;
+                    return QualifiedNameParser.Parse((QualifiedNameSyntax) syntaxNode);
                 case SyntaxKind.GenericName:
-                    break;
+                    return GenericNameParser.Parse((GenericNameSyntax) syntaxNode);
                 case SyntaxKind.TypeArgumentList:
-                    break;
+                    return TypeArgumentListParser.Parse((TypeArgumentListSyntax) syntaxNode);
                 case SyntaxKind.AliasQualifiedName:
                     break;
                 case SyntaxKind.PredefinedType:
-                    break;
+                    return PredefinedTypeParser.Parse((PredefinedTypeSyntax) syntaxNode);
                 case SyntaxKind.ArrayType:
                     break;
                 case SyntaxKind.ArrayRankSpecifier:
@@ -616,7 +400,7 @@ namespace DotnetNeater.CLI.Parser
                 case SyntaxKind.CollectionInitializerExpression:
                     break;
                 case SyntaxKind.ArrayInitializerExpression:
-                    break;
+                    return ArrayInitializerExpressionParser.Parse((InitializerExpressionSyntax) syntaxNode);
                 case SyntaxKind.AnonymousObjectMemberDeclarator:
                     break;
                 case SyntaxKind.ComplexElementInitializerExpression:
@@ -628,7 +412,7 @@ namespace DotnetNeater.CLI.Parser
                 case SyntaxKind.ArrayCreationExpression:
                     break;
                 case SyntaxKind.ImplicitArrayCreationExpression:
-                    break;
+                    return ImplicitArrayCreationExpressionParser.Parse((ImplicitArrayCreationExpressionSyntax)syntaxNode);
                 case SyntaxKind.StackAllocArrayCreationExpression:
                     break;
                 case SyntaxKind.OmittedArraySizeExpression:
@@ -752,7 +536,7 @@ namespace DotnetNeater.CLI.Parser
                 case SyntaxKind.NumericLiteralExpression:
                     break;
                 case SyntaxKind.StringLiteralExpression:
-                    break;
+                    return StringLiteralExpressionParser.Parse((LiteralExpressionSyntax) syntaxNode);
                 case SyntaxKind.CharacterLiteralExpression:
                     break;
                 case SyntaxKind.TrueLiteralExpression:
@@ -807,12 +591,10 @@ namespace DotnetNeater.CLI.Parser
                     break;
                 case SyntaxKind.Block:
                     break;
-                case SyntaxKind.LocalDeclarationStatement:
-                    break;
                 case SyntaxKind.VariableDeclaration:
-                    break;
+                    return VariableDeclarationParser.Parse((VariableDeclarationSyntax) syntaxNode);
                 case SyntaxKind.VariableDeclarator:
-                    break;
+                    return VariableDeclaratorParser.Parse((VariableDeclaratorSyntax) syntaxNode);
                 case SyntaxKind.EqualsValueClause:
                     break;
                 case SyntaxKind.ExpressionStatement:
@@ -884,15 +666,15 @@ namespace DotnetNeater.CLI.Parser
                 case SyntaxKind.LocalFunctionStatement:
                     break;
                 case SyntaxKind.CompilationUnit:
-                    return syntaxNode.ChildNodes()
-                        .Select(n => GetOperationRepresentation((CSharpSyntaxNode) n))
-                        .Aggregate(Nil(), (current, next) => current + next);
+                    return CompilationUnitParser.Parse((CompilationUnitSyntax) syntaxNode);
                 case SyntaxKind.GlobalStatement:
-                    break;
+                    return GlobalStatementParser.Parse((GlobalStatementSyntax) syntaxNode);
+                case SyntaxKind.LocalDeclarationStatement:
+                    return LocalDeclarationStatementParser.Parse((LocalDeclarationStatementSyntax) syntaxNode);
                 case SyntaxKind.NamespaceDeclaration:
                     break;
                 case SyntaxKind.UsingDirective:
-                    return ParseUsingDirectiveSyntax((UsingDirectiveSyntax) syntaxNode);
+                    return UsingDirectiveParser.Parse((UsingDirectiveSyntax) syntaxNode);
                 case SyntaxKind.ExternAliasDirective:
                     break;
                 case SyntaxKind.AttributeList:
@@ -906,7 +688,7 @@ namespace DotnetNeater.CLI.Parser
                 case SyntaxKind.AttributeArgument:
                     break;
                 case SyntaxKind.NameEquals:
-                    break;
+                    return NameEqualsParser.Parse((NameEqualsSyntax) syntaxNode);
                 case SyntaxKind.ClassDeclaration:
                     break;
                 case SyntaxKind.StructDeclaration:
@@ -1078,146 +860,6 @@ namespace DotnetNeater.CLI.Parser
             }
 
             return syntaxNode.ToFullString().Split("\n").Aggregate(Nil(), (current, next) => current + Text(next));
-        }
-
-        private static Operation ParseUsingDirectiveSyntax(UsingDirectiveSyntax usingDirective)
-        {
-            // https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/using-directive
-
-            if (usingDirective.Alias != null)
-            {
-                return
-                    ParseToken(usingDirective.UsingKeyword) + Text(" ") +
-                    ParseNameEqualsSyntax(usingDirective.Alias) +
-                    ParseNameSyntax(usingDirective.Name) +
-                    Text(";") +
-                    CombineSingleLineCommentsIntoLineSuffix(usingDirective) +
-                    Line();
-            }
-
-            if (usingDirective.StaticKeyword != default)
-            {
-                return
-                    ParseToken(usingDirective.UsingKeyword) + Text(" ") +
-                    ParseToken(usingDirective.StaticKeyword) + Text(" ") +
-                    ParseNameSyntax(usingDirective.Name) +
-                    Text(";") +
-                    CombineSingleLineCommentsIntoLineSuffix(usingDirective) +
-                    Line();
-            }
-
-            return
-                ParseToken(usingDirective.UsingKeyword) + Text(" ") +
-                ParseNameSyntax(usingDirective.Name) +
-                Text(";") +
-                CombineSingleLineCommentsIntoLineSuffix(usingDirective) +
-                Line();
-        }
-
-        private static Operation ParseToken(SyntaxToken token, bool removeSpaces = false)
-        {
-            var operation = Text(removeSpaces ? token.Text.WithoutSpaces() : token.Text);
-
-            // foreach (var trivia in token.TrailingTrivia.Where(t => t.Kind() == SyntaxKind.SingleLineCommentTrivia))
-            // {
-            //     operation += LineSuffix(Text(" " + trivia));
-            // }
-
-            return operation;
-        }
-
-        private static Operation ParseNameSyntax(NameSyntax nameSyntax)
-        {
-            return nameSyntax switch
-            {
-                AliasQualifiedNameSyntax _ => throw new NotImplementedException(nameof(AliasQualifiedNameSyntax)),
-                GenericNameSyntax genericNameSyntax => ParseGenericNameSyntax(genericNameSyntax),
-                IdentifierNameSyntax identifierNameSyntax => ParseIdentifierNameSyntax(identifierNameSyntax),
-                QualifiedNameSyntax qualifiedNameSyntax => ParseQualifiedNameSyntax(qualifiedNameSyntax),
-                SimpleNameSyntax simpleNameSyntax => ParseSimpleNameSyntax(simpleNameSyntax),
-                _ => throw new ArgumentOutOfRangeException(nameof(nameSyntax))
-            };
-        }
-
-        private static Operation ParseGenericNameSyntax(GenericNameSyntax genericNameSyntax)
-        {
-            return
-                ParseToken(genericNameSyntax.Identifier, removeSpaces: true) +
-                ParseTypeArgumentListSyntax(genericNameSyntax.TypeArgumentList);
-        }
-
-        private static Operation ParseIdentifierNameSyntax(IdentifierNameSyntax identifierNameSyntax)
-        {
-            return ParseToken(identifierNameSyntax.Identifier, removeSpaces: true);
-        }
-
-        private static Operation ParseQualifiedNameSyntax(QualifiedNameSyntax qualifiedNameSyntax)
-        {
-            return ParseNameSyntax(qualifiedNameSyntax.Left) + Text(".") + ParseNameSyntax(qualifiedNameSyntax.Right);
-        }
-
-        private static Operation ParseSimpleNameSyntax(SimpleNameSyntax simpleNameSyntax)
-        {
-            return ParseToken(simpleNameSyntax.Identifier, removeSpaces: true);
-        }
-
-        private static Operation ParseNameEqualsSyntax(NameEqualsSyntax nameEqualsSyntax)
-        {
-            return ParseIdentifierNameSyntax(nameEqualsSyntax.Name) + Text(" = ");
-        }
-
-        private static Operation ParseTypeArgumentListSyntax(TypeArgumentListSyntax typeArgumentListSyntax)
-        {
-            var arguments = typeArgumentListSyntax.Arguments.ToList();
-
-            var args = Nil();
-
-            for (var argumentIndex = 0; argumentIndex < arguments.Count; argumentIndex++)
-            {
-                var arg = arguments[argumentIndex];
-                args = argumentIndex == 0 ? ParseTypeSyntax(arg) : args + Text(", ") + ParseTypeSyntax(arg);
-            }
-
-            return Text("<") + args + Text(">");
-        }
-
-        private static Operation ParseTypeSyntax(TypeSyntax typeSyntax)
-        {
-            return typeSyntax switch
-            {
-                ArrayTypeSyntax arrayTypeSyntax => throw new NotImplementedException(),
-                AliasQualifiedNameSyntax aliasQualifiedNameSyntax => throw new NotImplementedException(),
-                FunctionPointerTypeSyntax functionPointerTypeSyntax => throw new NotImplementedException(),
-                GenericNameSyntax genericNameSyntax => throw new NotImplementedException(),
-                IdentifierNameSyntax identifierNameSyntax => throw new NotImplementedException(),
-                QualifiedNameSyntax qualifiedNameSyntax => throw new NotImplementedException(),
-                SimpleNameSyntax simpleNameSyntax => throw new NotImplementedException(),
-                NameSyntax nameSyntax => throw new NotImplementedException(),
-                NullableTypeSyntax nullableTypeSyntax => throw new NotImplementedException(),
-                OmittedTypeArgumentSyntax omittedTypeArgumentSyntax => throw new NotImplementedException(),
-                PointerTypeSyntax pointerTypeSyntax => throw new NotImplementedException(),
-                PredefinedTypeSyntax predefinedTypeSyntax => Text(predefinedTypeSyntax.Keyword.Text.WithoutSpaces()),
-                RefTypeSyntax refTypeSyntax => throw new NotImplementedException(),
-                TupleTypeSyntax tupleTypeSyntax => throw new NotImplementedException(),
-                _ => throw new ArgumentOutOfRangeException(nameof(typeSyntax))
-            };
-        }
-
-        private static Operation CombineSingleLineCommentsIntoLineSuffix(CSharpSyntaxNode syntaxNode)
-        {
-            var commentText = " //";
-
-            var trivia =
-                syntaxNode.DescendantTrivia()
-                    .Where(t => t.Kind() == SyntaxKind.SingleLineCommentTrivia)
-                    .ToList();
-
-            foreach (var singleLineCommentTrivia in trivia)
-            {
-                commentText += " " + singleLineCommentTrivia.ToString()["//".Length..].Trim();
-            }
-
-            return LineSuffix(Text(commentText));
         }
     }
 }

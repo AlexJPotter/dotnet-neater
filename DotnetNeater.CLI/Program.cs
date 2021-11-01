@@ -35,7 +35,7 @@ namespace DotnetNeater.CLI
             var oldSyntaxTree = (CSharpSyntaxTree) CSharpSyntaxTree.ParseText(oldFileContents);
             var oldRootNode = await oldSyntaxTree.GetRootAsync();
 
-            var rootOperation = SyntaxTreeParser.GetOperationRepresentation(oldRootNode);
+            var rootOperation = SyntaxTreeParser.Parse(oldRootNode);
 
             var printer = Printer.Printer.WithPreferredLineLength(30); // TODO - Take preferred line length from config
             var prettyPrinted = printer.Print(rootOperation);

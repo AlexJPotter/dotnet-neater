@@ -1,5 +1,7 @@
 ﻿using DotnetNeater.CLI.Operations;
+using DotnetNeater.CLI.Parser;
 using DotnetNeater.CLI.Printer;
+using Microsoft.CodeAnalysis.CSharp;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -97,6 +99,23 @@ namespace DotnetNeater.Tests
             testOutputHelper.WriteLine(result);
             testOutputHelper.WriteLine("");
             Assert.Equal(expected, result);
+        }
+
+        [Fact]
+        public void Example2()
+        {
+            var fileContents = TestHelpers.ReadFileAsString("ExampleCode.cs");
+            Assert.NotEmpty(fileContents);
+
+            var syntaxTree = (CSharpSyntaxTree) CSharpSyntaxTree.ParseText(fileContents);
+            var rootNode = syntaxTree.GetRoot();
+
+            var rootOperator = SyntaxTreeParser.Parse(rootNode);
+            var printer = Printer.WithPreferredLineLength(30);
+            var printed = printer.Print(rootOperator);
+
+            var expectedFileContents = TestHelpers.ReadFileAsString("ExampleCodeFormatted.cs");
+            Assert.Equal(expectedFileContents, printed);
         }
     }
 }
