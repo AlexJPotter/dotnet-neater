@@ -1,9 +1,9 @@
-﻿using DotnetNeater.CLI.Operations;
-using DotnetNeater.CLI.Parser;
+﻿using DotnetNeater.CLI.Parser;
 using DotnetNeater.CLI.Printer;
 using Microsoft.CodeAnalysis.CSharp;
 using Xunit;
 using Xunit.Abstractions;
+using static DotnetNeater.CLI.Operations.Operator;
 
 namespace DotnetNeater.Tests
 {
@@ -36,26 +36,29 @@ namespace DotnetNeater.Tests
 
             // How do we express our intention?
 
-            // To start with, it's clear that we want to put all the names on one line if we can, but if they don't fit
+            // Let's start with just the names..
+
+            // To start with, it's clear that we want to put everything on one line if we can, but if it doesn't fit
             // we want a line break between each one. We can do this by expressing each string name using the `Text`
             // Operator, expressing our intention to have a (potential) line break between each using the `Line`
             // Operator, joining them with the `Concat` Operator (the native + operator is overloaded for this), and
             // finally using the `Group` Operator to express that we want to keep them on the same line if possible:
-            var rootOperation = Operator.Group(
-                Operator.Text("names = new[]") + Operator.Line() +
-                Operator.Text("{") +
-                Operator.Nest(
-                    4,
-                    Operator.Line() +
-                    Operator.Group(
-                        Operator.Text(@"""Alex"",") + Operator.Line() + // Why aren't these lines counting?
-                        Operator.Text(@"""Martin"",") + Operator.Line() +
-                        Operator.Text(@"""Matt"",") + Operator.Line() +
-                        Operator.Text(@"""Harry"",") + Operator.Line() +
-                        Operator.Text(@"""Max"",")
-                    )
-                ) + Operator.Line() +
-                Operator.Text("};")
+            var namesPart =
+                Group(
+                    Text(@"""Alex"",") + Line() +
+                    Text(@"""Martin"",") + Line() +
+                    Text(@"""Matt"",") + Line() +
+                    Text(@"""Harry"",") + Line() +
+                    Text(@"""Max"",")
+                );
+
+            // Most of this should make sense now - the `Nest` operator is the only new bit
+            var rootOperation = Group(
+                Text("names = new[]") + Line() +
+                Text("{") +
+                Nest(4, Line() + namesPart) +
+                Line() +
+                Text("};")
             );
 
             // The full expression we're formatting is about 60 characters long, so if we print with a desired line
@@ -87,7 +90,7 @@ namespace DotnetNeater.Tests
             printer = Printer.WithPreferredLineLength(44);
             result = printer.Print(rootOperation);
             expected =
-                @"names = new[]
+@"names = new[]
 {
     ""Alex"",
     ""Martin"",

@@ -10,18 +10,20 @@ namespace DotnetNeater.CLI.Parser.Expressions
         public static Operation Parse(InitializerExpressionSyntax arrayInitializerExpression)
         {
             return
-                Text("{") +
-                Nest(
-                    4, // TODO - Make tab width configurable
-                    arrayInitializerExpression.Expressions.Aggregate(
-                        Nil(),
-                        (current, next) =>
-                            current + Line() +
-                            SyntaxTreeParser.Parse(next) + Text(",")
-                    )
-                ) +
-                Line() +
-                Text("}");
+                Group(
+                    Text("{") +
+                        Nest(
+                            4, // TODO - Make tab width configurable
+                            arrayInitializerExpression.Expressions.Aggregate(
+                                Nil(),
+                                (current, next) =>
+                                    current + Line() +
+                                    SyntaxTreeParser.Parse(next) + Text(",")
+                            )
+                        ) +
+                        Line() +
+                    Text("}")
+                );
         }
     }
 }

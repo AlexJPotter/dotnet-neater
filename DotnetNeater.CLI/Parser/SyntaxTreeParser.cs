@@ -590,7 +590,7 @@ namespace DotnetNeater.CLI.Parser
                 case SyntaxKind.QueryContinuation:
                     break;
                 case SyntaxKind.Block:
-                    break;
+                    return BlockParser.Parse((BlockSyntax) syntaxNode);
                 case SyntaxKind.VariableDeclaration:
                     return VariableDeclarationParser.Parse((VariableDeclarationSyntax) syntaxNode);
                 case SyntaxKind.VariableDeclarator:
@@ -614,7 +614,7 @@ namespace DotnetNeater.CLI.Parser
                 case SyntaxKind.ContinueStatement:
                     break;
                 case SyntaxKind.ReturnStatement:
-                    break;
+                    return ReturnStatementParser.Parse((ReturnStatementSyntax) syntaxNode);
                 case SyntaxKind.YieldReturnStatement:
                     break;
                 case SyntaxKind.YieldBreakStatement:
@@ -672,7 +672,7 @@ namespace DotnetNeater.CLI.Parser
                 case SyntaxKind.LocalDeclarationStatement:
                     return LocalDeclarationStatementParser.Parse((LocalDeclarationStatementSyntax) syntaxNode);
                 case SyntaxKind.NamespaceDeclaration:
-                    break;
+                    return NamespaceDeclarationParser.Parse((NamespaceDeclarationSyntax) syntaxNode);
                 case SyntaxKind.UsingDirective:
                     return UsingDirectiveParser.Parse((UsingDirectiveSyntax) syntaxNode);
                 case SyntaxKind.ExternAliasDirective:
@@ -690,7 +690,7 @@ namespace DotnetNeater.CLI.Parser
                 case SyntaxKind.NameEquals:
                     return NameEqualsParser.Parse((NameEqualsSyntax) syntaxNode);
                 case SyntaxKind.ClassDeclaration:
-                    break;
+                    return ClassDeclarationParser.Parse((ClassDeclarationSyntax) syntaxNode);
                 case SyntaxKind.StructDeclaration:
                     break;
                 case SyntaxKind.InterfaceDeclaration:
@@ -722,7 +722,7 @@ namespace DotnetNeater.CLI.Parser
                 case SyntaxKind.EventFieldDeclaration:
                     break;
                 case SyntaxKind.MethodDeclaration:
-                    break;
+                    return MethodDeclarationParser.Parse((MethodDeclarationSyntax) syntaxNode);
                 case SyntaxKind.OperatorDeclaration:
                     break;
                 case SyntaxKind.ConversionOperatorDeclaration:

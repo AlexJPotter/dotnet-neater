@@ -3,7 +3,7 @@ using DotnetNeater.CLI.Operations;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace DotnetNeater.CLI.Parser.Statements
+namespace DotnetNeater.CLI.Parser.Other
 {
     public static class CompilationUnitParser
     {

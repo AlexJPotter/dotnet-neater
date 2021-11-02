@@ -51,6 +51,11 @@ namespace DotnetNeater.CLI.Parser.Directives
                     .Where(t => t.Kind() == SyntaxKind.SingleLineCommentTrivia)
                     .ToList();
 
+            if (!trivia.Any())
+            {
+                return Nil();
+            }
+
             foreach (var singleLineCommentTrivia in trivia)
             {
                 commentText += " " + singleLineCommentTrivia.ToString()["//".Length..].Trim();

@@ -41,7 +41,10 @@ namespace DotnetNeater.CLI
             var prettyPrinted = printer.Print(rootOperation);
 
             var newSyntaxTree = (CSharpSyntaxTree) CSharpSyntaxTree.ParseText(prettyPrinted);
-
+            newSyntaxTree =
+                (CSharpSyntaxTree)CSharpSyntaxTree.ParseText(
+                    TrimTrailingWhitespace.FromNode(newSyntaxTree.GetRoot()).GetText().ToString()
+                );
             var hasChanged = newSyntaxTree.GetChanges(oldSyntaxTree).Any();
 
             if (hasChanged)
