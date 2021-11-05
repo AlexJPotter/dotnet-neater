@@ -18,7 +18,7 @@ namespace DotnetNeater.CLI.Parser.Statements
                 Text("return") +
                 Nest(
                     4,
-                    Line() + SyntaxTreeParser.Parse(returnStatement.Expression)
+                    Line() + BaseParser.Parse(returnStatement.Expression)
                 ) +
                 Text(";")
             );

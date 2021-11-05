@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using DotnetNeater.CLI.Helpers;
 using DotnetNeater.CLI.Parser;
-using Microsoft.Build.Construction;
 using Microsoft.CodeAnalysis.CSharp;
 
 namespace DotnetNeater.CLI
@@ -14,7 +13,7 @@ namespace DotnetNeater.CLI
         public static async Task Main(string[] args)
         {
             Console.WriteLine();
-            Console.WriteLine("*** dotnet-neater ***");
+            ConsoleHelpers.WriteLine( color: ConsoleColor.Cyan, text: "*** dotnet-neater ***");
             Console.WriteLine();
 
             var currentDirectory = Environment.CurrentDirectory;
@@ -35,16 +34,12 @@ namespace DotnetNeater.CLI
             var oldSyntaxTree = (CSharpSyntaxTree) CSharpSyntaxTree.ParseText(oldFileContents);
             var oldRootNode = await oldSyntaxTree.GetRootAsync();
 
-            var rootOperation = SyntaxTreeParser.Parse(oldRootNode);
+            var rootOperation = BaseParser.Parse(oldRootNode);
 
-            var printer = Printer.Printer.WithPreferredLineLength(30); // TODO - Take preferred line length from config
+            var printer = Printer.Printer.WithPreferredLineLength(120); // TODO - Take preferred line length from config
             var prettyPrinted = printer.Print(rootOperation);
 
-            var newSyntaxTree = (CSharpSyntaxTree) CSharpSyntaxTree.ParseText(prettyPrinted);
-            newSyntaxTree =
-                (CSharpSyntaxTree)CSharpSyntaxTree.ParseText(
-                    TrimTrailingWhitespace.FromNode(newSyntaxTree.GetRoot()).GetText().ToString()
-                );
+            var newSyntaxTree = WithoutTrailingWhitespace((CSharpSyntaxTree)CSharpSyntaxTree.ParseText(prettyPrinted));
             var hasChanged = newSyntaxTree.GetChanges(oldSyntaxTree).Any();
 
             if (hasChanged)
@@ -53,10 +48,13 @@ namespace DotnetNeater.CLI
                 await File.WriteAllTextAsync(filePath, newFileContents);
             }
 
-            var originalConsoleColour = Console.ForegroundColor;
-            Console.ForegroundColor = hasChanged ? ConsoleColor.White : ConsoleColor.DarkGray;
-            Console.WriteLine(filePath);
-            Console.ForegroundColor = originalConsoleColour;
+            ConsoleHelpers.WriteLine(
+                color: hasChanged ? ConsoleColor.White : ConsoleColor.DarkGray,
+                text: filePath
+            );
         }
+
+        private static CSharpSyntaxTree WithoutTrailingWhitespace(CSharpSyntaxTree originalTree) =>
+            (CSharpSyntaxTree) CSharpSyntaxTree.Create(TrimTrailingWhitespace.FromNode(originalTree.GetRoot()));
     }
 }

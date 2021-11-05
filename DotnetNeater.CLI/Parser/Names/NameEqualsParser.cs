@@ -7,7 +7,7 @@ namespace DotnetNeater.CLI.Parser.Names
     {
         public static Operation Parse(NameEqualsSyntax nameEquals)
         {
-            return SyntaxTreeParser.Parse(nameEquals.Name) + Operator.Text(" = ");
+            return BaseParser.Parse(nameEquals.Name) + Operator.Text(" = ");
         }
     }
 }

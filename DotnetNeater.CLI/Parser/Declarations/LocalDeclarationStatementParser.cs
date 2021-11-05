@@ -8,7 +8,7 @@ namespace DotnetNeater.CLI.Parser.Declarations
     {
         public static Operation Parse(LocalDeclarationStatementSyntax localDeclarationStatement)
         {
-            return SyntaxTreeParser.Parse(localDeclarationStatement.Declaration) + Text(";") + Line();
+            return BaseParser.Parse(localDeclarationStatement.Declaration) + Text(";") + Line();
         }
     }
 }

@@ -11,13 +11,13 @@ namespace DotnetNeater.CLI.Parser.Declarations
         {
             return
                 Line() +
-                Text("namespace ") + SyntaxTreeParser.Parse(namespaceDeclaration.Name) +
+                Text("namespace ") + BaseParser.Parse(namespaceDeclaration.Name) +
                 Line() +
                 Text("{") +
                 Nest(
                     4,
                     Line() +
-                    Join(Nil(), namespaceDeclaration.Members.Select(SyntaxTreeParser.Parse).ToList())
+                    Join(Nil(), namespaceDeclaration.Members.Select(BaseParser.Parse).ToList())
                 )
                 + Line()
                 + Text("}")

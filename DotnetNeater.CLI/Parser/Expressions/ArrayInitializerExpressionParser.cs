@@ -18,7 +18,7 @@ namespace DotnetNeater.CLI.Parser.Expressions
                                 Nil(),
                                 (current, next) =>
                                     current + Line() +
-                                    SyntaxTreeParser.Parse(next) + Text(",")
+                                    BaseParser.Parse(next) + Text(",")
                             )
                         ) +
                         Line() +

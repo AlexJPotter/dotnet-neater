@@ -28,7 +28,7 @@ namespace DotnetNeater.Tests
         public static Operation GetRootOperation(string code)
         {
             var syntaxTree = (CSharpSyntaxTree) CSharpSyntaxTree.ParseText(code);
-            return SyntaxTreeParser.Parse(syntaxTree.GetRoot());
+            return BaseParser.Parse(syntaxTree.GetRoot());
         }
 
         public static string FormatCode(int preferredLineLength, string code)

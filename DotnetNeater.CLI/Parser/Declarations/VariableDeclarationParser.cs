@@ -12,7 +12,7 @@ namespace DotnetNeater.CLI.Parser.Declarations
             var typeSyntax = variableDeclaration.Type;
             var typeText = Text(typeSyntax.GetText().ToString().Trim()); // TODO - might need more complicated rules
 
-            var variables = variableDeclaration.Variables.Select(SyntaxTreeParser.Parse).ToList();
+            var variables = variableDeclaration.Variables.Select(BaseParser.Parse).ToList();
 
             return typeText + Text(" ") + Join(Text(", "), variables);
         }

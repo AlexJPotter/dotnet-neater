@@ -8,9 +8,9 @@ namespace DotnetNeater.CLI.Parser.Names
         public static Operation Parse(QualifiedNameSyntax qualifiedNameSyntax)
         {
             return
-                SyntaxTreeParser.Parse(qualifiedNameSyntax.Left) +
+                BaseParser.Parse(qualifiedNameSyntax.Left) +
                 Operator.Text(".") +
-                SyntaxTreeParser.Parse(qualifiedNameSyntax.Right);
+                BaseParser.Parse(qualifiedNameSyntax.Right);
         }
     }
 }

@@ -9,7 +9,7 @@ namespace DotnetNeater.CLI.Parser.Other
     {
         public static Operation Parse(TypeArgumentListSyntax typeArgumentList)
         {
-            var arguments = typeArgumentList.Arguments.Select(SyntaxTreeParser.Parse).ToList();
+            var arguments = typeArgumentList.Arguments.Select(BaseParser.Parse).ToList();
             return Text("<") + Join(Text(", "), arguments) + Text(">");
         }
     }

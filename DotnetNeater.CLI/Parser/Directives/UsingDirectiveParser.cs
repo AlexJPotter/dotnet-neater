@@ -17,8 +17,8 @@ namespace DotnetNeater.CLI.Parser.Directives
             {
                 return
                     Text("using ") +
-                    SyntaxTreeParser.Parse(usingDirective.Alias) +
-                    SyntaxTreeParser.Parse(usingDirective.Name) +
+                    BaseParser.Parse(usingDirective.Alias) +
+                    BaseParser.Parse(usingDirective.Name) +
                     Text(";") +
                     CombineSingleLineCommentsIntoLineSuffix(usingDirective) +
                     Line();
@@ -28,7 +28,7 @@ namespace DotnetNeater.CLI.Parser.Directives
             {
                 return
                     Text("using static ") +
-                    SyntaxTreeParser.Parse(usingDirective.Name) +
+                    BaseParser.Parse(usingDirective.Name) +
                     Text(";") +
                     CombineSingleLineCommentsIntoLineSuffix(usingDirective) +
                     Line();
@@ -36,7 +36,7 @@ namespace DotnetNeater.CLI.Parser.Directives
 
             return
                 Text("using ") +
-                SyntaxTreeParser.Parse(usingDirective.Name) +
+                BaseParser.Parse(usingDirective.Name) +
                 Text(";") +
                 CombineSingleLineCommentsIntoLineSuffix(usingDirective) +
                 Line();

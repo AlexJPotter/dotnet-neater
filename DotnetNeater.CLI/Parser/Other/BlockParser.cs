@@ -14,7 +14,7 @@ namespace DotnetNeater.CLI.Parser.Other
                 Nest(
                     4,
                     Line() +
-                    Join(Nil(), block.Statements.Select(SyntaxTreeParser.Parse).ToList())
+                    Join(Nil(), block.Statements.Select(BaseParser.Parse).ToList())
                 ) +
                 Line() +
                 Text("}");

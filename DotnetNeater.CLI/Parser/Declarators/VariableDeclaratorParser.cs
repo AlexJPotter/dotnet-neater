@@ -13,7 +13,7 @@ namespace DotnetNeater.CLI.Parser.Declarators
             var valueRepresentation =
                 variableDeclarator.Initializer == null
                     ? null
-                    : SyntaxTreeParser.Parse(variableDeclarator.Initializer.Value);
+                    : BaseParser.Parse(variableDeclarator.Initializer.Value);
 
             return Text(variableName) + (valueRepresentation == null ? Nil() : Text(" = ") + valueRepresentation);
         }

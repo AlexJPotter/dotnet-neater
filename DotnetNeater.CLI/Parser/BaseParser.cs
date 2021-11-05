@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using DotnetNeater.CLI.Helpers;
 using DotnetNeater.CLI.Operations;
 using DotnetNeater.CLI.Parser.Declarations;
 using DotnetNeater.CLI.Parser.Declarators;
@@ -15,7 +16,7 @@ using static DotnetNeater.CLI.Operations.Operator;
 
 namespace DotnetNeater.CLI.Parser
 {
-    public static class SyntaxTreeParser
+    public static class BaseParser
     {
         public static Operation Parse(CSharpSyntaxNode syntaxNode)
         {
@@ -24,6 +25,7 @@ namespace DotnetNeater.CLI.Parser
             switch (nodeKind)
             {
                 case SyntaxKind.None:
+                    // TODO - We might be able to continue here instead
                     throw new Exception("Syntax error");
                 case SyntaxKind.List:
                     break;
@@ -376,15 +378,15 @@ namespace DotnetNeater.CLI.Parser
                 case SyntaxKind.ConditionalExpression:
                     break;
                 case SyntaxKind.InvocationExpression:
-                    break;
+                    return InvocationExpressionParser.Parse((InvocationExpressionSyntax) syntaxNode);
                 case SyntaxKind.ElementAccessExpression:
                     break;
                 case SyntaxKind.ArgumentList:
-                    break;
+                    return ArgumentListParser.Parse((ArgumentListSyntax) syntaxNode);
                 case SyntaxKind.BracketedArgumentList:
                     break;
                 case SyntaxKind.Argument:
-                    break;
+                    return ArgumentParser.Parse((ArgumentSyntax) syntaxNode);
                 case SyntaxKind.NameColon:
                     break;
                 case SyntaxKind.CastExpression:
@@ -470,7 +472,7 @@ namespace DotnetNeater.CLI.Parser
                 case SyntaxKind.CoalesceExpression:
                     break;
                 case SyntaxKind.SimpleMemberAccessExpression:
-                    break;
+                    return SimpleMemberAccessExpressionParser.Parse((MemberAccessExpressionSyntax) syntaxNode);
                 case SyntaxKind.PointerMemberAccessExpression:
                     break;
                 case SyntaxKind.ConditionalAccessExpression:
@@ -598,7 +600,7 @@ namespace DotnetNeater.CLI.Parser
                 case SyntaxKind.EqualsValueClause:
                     break;
                 case SyntaxKind.ExpressionStatement:
-                    break;
+                    return ExpressionStatementParser.Parse((ExpressionStatementSyntax) syntaxNode);
                 case SyntaxKind.EmptyStatement:
                     break;
                 case SyntaxKind.LabeledStatement:
@@ -858,6 +860,8 @@ namespace DotnetNeater.CLI.Parser
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+
+            ConsoleHelpers.Warn($"\r\nWARNING: Did not handle syntax node of kind '{syntaxNode.Kind().ToString()}'");
 
             return syntaxNode.ToFullString().Split("\n").Aggregate(Nil(), (current, next) => current + Text(next));
         }

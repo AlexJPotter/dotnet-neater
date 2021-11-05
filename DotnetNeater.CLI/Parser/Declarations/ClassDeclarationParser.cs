@@ -23,7 +23,7 @@ namespace DotnetNeater.CLI.Parser.Declarations
                 Nest(
                     4,
                     Line() +
-                    Join(Nil(), classDeclaration.Members.Select(SyntaxTreeParser.Parse).ToList())
+                    Join(Nil(), classDeclaration.Members.Select(BaseParser.Parse).ToList())
                 ) +
                 Line() +
                 Text("}");

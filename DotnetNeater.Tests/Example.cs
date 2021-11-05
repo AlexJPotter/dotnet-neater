@@ -118,7 +118,7 @@ namespace DotnetNeater.Tests
             var syntaxTree = (CSharpSyntaxTree) CSharpSyntaxTree.ParseText(fileContents);
             var rootNode = syntaxTree.GetRoot();
 
-            var rootOperator = SyntaxTreeParser.Parse(rootNode);
+            var rootOperator = BaseParser.Parse(rootNode);
             var printer = Printer.WithPreferredLineLength(30);
             var printed = printer.Print(rootOperator);
 

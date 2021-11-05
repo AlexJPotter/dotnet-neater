@@ -8,9 +8,7 @@ namespace DotnetNeater.CLI.Parser.Expressions
     {
         public static Operation Parse(ImplicitArrayCreationExpressionSyntax implicitArrayCreationExpression)
         {
-            return
-                Text("new[]") + Line() +
-                SyntaxTreeParser.Parse(implicitArrayCreationExpression.Initializer);
+            return Group(Text("new[]") + Line() + BaseParser.Parse(implicitArrayCreationExpression.Initializer));
         }
     }
 }

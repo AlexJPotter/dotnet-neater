@@ -11,7 +11,7 @@ namespace DotnetNeater.CLI.Parser.Other
         {
             return
                 compilationUnit.ChildNodes()
-                    .Select(n => SyntaxTreeParser.Parse((CSharpSyntaxNode)n))
+                    .Select(n => BaseParser.Parse((CSharpSyntaxNode)n))
                     .Aggregate(Operator.Nil(), (current, next) => current + next);
         }
     }

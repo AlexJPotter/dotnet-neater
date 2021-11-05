@@ -16,11 +16,11 @@ namespace DotnetNeater.CLI.Parser.Declarations
                     methodDeclaration.Modifiers.Select(token => Text(token.Text.WithoutSpaces())).ToList()
                 );
 
-            var returnTypePart = SyntaxTreeParser.Parse(methodDeclaration.ReturnType);
+            var returnTypePart = BaseParser.Parse(methodDeclaration.ReturnType);
 
             var methodName = Text(methodDeclaration.Identifier.Text.WithoutSpaces());
 
-            var bodyPart = SyntaxTreeParser.Parse(
+            var bodyPart = BaseParser.Parse(
                 methodDeclaration.Body != null
                     ? methodDeclaration.Body
                     : methodDeclaration.ExpressionBody

@@ -9,7 +9,7 @@ namespace DotnetNeater.CLI.Parser.Names
         {
             return
                 Operator.Text(genericName.Identifier.Text.Trim()) +
-                SyntaxTreeParser.Parse(genericName.TypeArgumentList);
+                BaseParser.Parse(genericName.TypeArgumentList);
         }
     }
 }
